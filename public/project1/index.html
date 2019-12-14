@@ -73,7 +73,7 @@
 <div id="introduction" class="section level1">
 <h1>Introduction</h1>
 <p>Below are the two data sets that I will be merging and investigating for this project.</p>
-<p>The first dataset, Strava_Data, I collected manually from an app I have on my phone that tracks my running. I have been using the app since Octtober of 2017, so I collected data from every single run I have recorded since then up until October 1st of this year, which has been 619 runs. For each run, I collected data on:</p>
+<p>The first dataset, Strava_Data, I collected manually from an app I have on my phone that tracks my running. I have been using the app since October of 2017, so I collected data from every single run I have recorded since then up until October 1st of this year, which has been 619 runs. For each run, I collected data on:</p>
 <p>when I ran (date, time of day, and day)</p>
 <p>where I ran (location)</p>
 <p>how far I ran (distance)</p>
@@ -171,7 +171,7 @@ dat4$Max.Temp &lt;- as.numeric(dat4$Max.Temp)</code></pre>
 ## 5 Tuesday            5.82
 ## 6 Monday             5.80
 ## 7 Wednesday          5.48</code></pre>
-<p>Above shows the mean distance I run on each day of the week. Most of my races occur on Saturday’s, and I rarelt have Friday classes, so it makes sense that those two are the highest.</p>
+<p>Above shows the mean distance I run on each day of the week. Most of my races occur on Saturday’s, and I rarely have Friday classes, so it makes sense that those two are the highest.</p>
 <pre class="r"><code>dat4 %&gt;% group_by(Location) %&gt;% 
   filter(Location==&quot;Austin&quot;) %&gt;% 
   summarize(mean_Pace = mean(Pace)) %&gt;% 

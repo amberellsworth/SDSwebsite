@@ -15,12 +15,16 @@ Toriose-shells and calicos both undergo an amazing phenomenon in regards to thei
 There are some traits that animals can have that are "sex-linked" - that is, they reside on the X chromosome. Females undergo X-chromosome inactivation, where segments of each X chromosome are randomly inactivated such that the organism only has the genetic material to account for one X chromosome. This is a form of dosage compensation, so that males (who only have 1 X chromosome) and females(who have 2) end up with the same net amount of genetic informaton that comes from the X chromosome. 
 
 Coat patterns in female cats come from interactions between two genes:
+
 One is a sex-linked gene whose alleles can make the coat black/grey or orange
+
 The other is an autosomal gene (not sex-linked) that controls for white color
 
 Tortiose-shell patterns occur when two things occur:
+
 The animal inherits two recessive autosomal alles of the gene that controls for white color, resulting in an absence of white. (If there were white color, the cat would be a calico, not a tortiose-shell).
-The animal is has heterozygous X chromosomes - meaning that one X chromosome codes for black/grey color, and the other codes for orange color. During development, melanocytes from each of these two differening alleles are formed and migrate to the epidermis once the cat is born. 
+
+The animal has heterozygous X chromosomes - meaning that one X chromosome codes for black/grey color, and the other codes for orange color. During development, melanocytes from each of these two differening alleles are formed and migrate to the epidermis once the cat is born. 
 
 Since the migration of these melanocytes is somewhat random in nature, even if two cats had the exact same underyling genome, their fur patterns would still look different! The colors would be the same, but not the fur pattern itself.  
 

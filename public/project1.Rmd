@@ -21,7 +21,7 @@ library(tidyr)
 
 Below are the two data sets that I will be merging and investigating for this project.
 
-The first dataset, Strava_Data, I collected manually from an app I have on my phone that tracks my running. I have been using the app since Octtober of 2017, so I collected data from every single run I have recorded since then up until October 1st of this year, which has been 619 runs. For each run, I collected data on:
+The first dataset, Strava_Data, I collected manually from an app I have on my phone that tracks my running. I have been using the app since October of 2017, so I collected data from every single run I have recorded since then up until October 1st of this year, which has been 619 runs. For each run, I collected data on:
 
 when I ran (date, time of day, and day)
 
@@ -106,7 +106,7 @@ dat4 %>% group_by(Day) %>% summarize(mean_Distance = mean(Distance)) %>%
   arrange(desc(mean_Distance))
 ```
 
-Above shows the mean distance I run on each day of the week. Most of my races occur on Saturday's, and I rarelt have Friday classes, so it makes sense that those two are the highest.
+Above shows the mean distance I run on each day of the week. Most of my races occur on Saturday's, and I rarely have Friday classes, so it makes sense that those two are the highest.
 
 ```{r}
 dat4 %>% group_by(Location) %>% 
