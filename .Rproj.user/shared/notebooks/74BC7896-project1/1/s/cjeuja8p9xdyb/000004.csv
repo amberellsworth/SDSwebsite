@@ -1,0 +1,4 @@
+"0","dat4 %>% group_by(Location) %>% "
+"0","  filter(Location==""Austin"") %>% "
+"0","  summarize(mean_Pace = mean(Pace)) %>% "
+"0","  arrange(desc(mean_Pace))"

@@ -1,0 +1,5 @@
+"0","dat8 <- dat4 %>% group_by(Terrain) %>% summarize(mean_Pace = mean(Pace), mean_Distance=mean(Distance))"
+"0","ggplot(data = dat8, aes(x = mean_Distance, y = mean_Pace, color = Terrain)) + theme_dark() + "
+"0","  geom_point(size=10, shape=""triangle"")  + "
+"0","  labs(x = ""mean distance (miles)"", y = ""mean pace (mph)"", "
+"0","       title = ""Mean distance and pace for different terrains"")"

@@ -1,0 +1,26 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1576291817490.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "41897638",
+    "id" : "98C04757",
+    "lastKnownWriteTime" : 1576292960,
+    "last_content_update" : 1576292960451,
+    "path" : "C:/Users/Amber/Desktop/SDSWebsite/content/Project2a.Rmd",
+    "project_path" : "content/Project2a.Rmd",
+    "properties" : {
+        "cursorPosition" : "405,1",
+        "last_setup_crc32" : "C13333CC5acbfa6f",
+        "scrollLine" : "385"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_markdown"
+}

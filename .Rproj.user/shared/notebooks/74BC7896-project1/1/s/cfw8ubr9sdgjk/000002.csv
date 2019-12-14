@@ -1,0 +1,3 @@
+"0","ggplot(data = dat5, aes(x=month, y=Distance)) +geom_bar(size=5, stat = ""summary"", fill=""#66cdaa"") + "
+"0","  theme_dark() +"
+"0","  labs(y=""Distance (miles)"", title = ""Average mileage over different months"")"

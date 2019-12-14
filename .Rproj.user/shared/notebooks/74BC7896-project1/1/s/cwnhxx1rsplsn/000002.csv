@@ -1,0 +1,1 @@
+"0","dat4 <- dat4 %>% mutate(GainPerMile=Elevation/Distance)"

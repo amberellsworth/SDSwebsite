@@ -1,0 +1,1 @@
+"0","dat4 %>% filter(ntile(Elevation, 100) > 75) %>% summarize(mean_Pace_hilly = mean(Pace))"

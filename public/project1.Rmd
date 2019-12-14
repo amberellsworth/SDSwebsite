@@ -1,0 +1,261 @@
+---
+title: "Project 1: Running and Weather Data Visualization"
+output: html_document
+date: '10/15/2019'
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, include=FALSE}
+library(readr)
+library(tibble)
+library(dplyr)
+library(ggplot2)
+library(tidyr)
+```
+
+
+# Introduction
+
+Below are the two data sets that I will be merging and investigating for this project.
+
+The first dataset, Strava_Data, I collected manually from an app I have on my phone that tracks my running. I have been using the app since Octtober of 2017, so I collected data from every single run I have recorded since then up until October 1st of this year, which has been 619 runs. For each run, I collected data on:
+
+when I ran (date, time of day, and day)
+
+where I ran (location)
+
+how far I ran (distance)
+
+how long it took (time)
+
+my average pace in miles per hour
+
+my total elevation gain in feet
+
+the type of terrain that I ran on, which was either treadmill, road, trail, or mixed(trail and road on the same run)
+
+whether or not it was a race
+
+temperature data for locations other than Austin, looked up manually
+
+The second dataset I got from NOAA. It has the minimum, average, and maximum daily temperatures in Austin, as recorded from the Camp Mabry weather station.
+
+```{r}
+Strava_Data1 <- read_csv("Strava Data1.csv", 
+    col_types = cols(Avg.Temp = col_number(), 
+        Date = col_date(format = "%m/%d/%Y"), 
+        Distance = col_number(), Elevation = col_number(), 
+        Max.Temp = col_number(), Min.Temp = col_number(), 
+        Pace = col_number(), Time = col_number()))
+Weather_Data <- read_csv("Weather Data.csv", 
+    col_types = cols(Avg.Temp = col_number(), 
+        Date = col_date(format = "%m/%d/%Y"), 
+        Max.Temp = col_number(), Min.Temp = col_number()))
+head(Strava_Data1)
+head(Weather_Data)
+```
+  
+## Joining Datasets 
+```{r, warning=FALSE}
+dat <- Strava_Data1 %>% filter(is.na(Min.Temp))
+weatherdat2 <- Weather_Data %>% rename(minimum.temp=Min.Temp, average.temp=Avg.Temp, maximum.temp=Max.Temp)
+dat1 <- inner_join(dat, weatherdat2, by="Date")
+dat2 <- dat1 %>% select(-Min.Temp, -Max.Temp, -Avg.Temp)
+dat3 <- left_join(Strava_Data1, dat2)
+dat3$Min.Temp = ifelse(is.na(dat3$Min.Temp), paste(dat3$minimum.temp),paste(dat3$Min.Temp))
+dat3$Avg.Temp = ifelse(is.na(dat3$Avg.Temp), paste(dat3$average.temp),paste(dat3$Avg.Temp))
+dat3$Max.Temp = ifelse(is.na(dat3$Max.Temp), paste(dat3$maximum.temp),paste(dat3$Max.Temp))
+dat4 <- dat3 %>% select(-minimum.temp, -average.temp, -maximum.temp)
+dat4$Avg.Temp <- as.numeric(dat4$Avg.Temp)
+dat4$Min.Temp <- as.numeric(dat4$Min.Temp)
+dat4$Max.Temp <- as.numeric(dat4$Max.Temp)
+```
+
+I used both a left join and an inner join.
+
+## Tidying Data
+
+```{r}
+dat5<- dat4 %>%  separate(Date, c('year','month','day'), sep = "-", remove = TRUE)
+```
+
+To tidy the data, I separated date into year, month, and date, so that I have the option to manipulate the data based on a specific month or year if I want.
+
+## Mutating Data
+
+```{r}
+dat4 <- dat4 %>% mutate(GainPerMile=Elevation/Distance)
+```
+
+I added the variable GainPerMile, which shows the average elevation gain per mile of each run. This is useful because elevation naturally varies with distance, because the further I run, the more elevation I'm going to gain. Gain per mile allows a better estimate of how "hilly" a run actually is.
+
+## The means and standard deviations of each numeric variable.
+
+```{r}
+dat4 %>% summarise_if(is.numeric, mean)
+dat4 %>% summarise_if(is.numeric, sd)
+```
+
+# Quick Stats
+
+```{r}
+dat4 %>% group_by(Day) %>% summarize(mean_Distance = mean(Distance)) %>% 
+  arrange(desc(mean_Distance))
+```
+
+Above shows the mean distance I run on each day of the week. Most of my races occur on Saturday's, and I rarelt have Friday classes, so it makes sense that those two are the highest.
+
+```{r}
+dat4 %>% group_by(Location) %>% 
+  filter(Location=="Austin") %>% 
+  summarize(mean_Pace = mean(Pace)) %>% 
+  arrange(desc(mean_Pace))
+```
+
+Above shows where I have ran the fastest, out of my runs in Austin.
+
+```{r}
+dat4 %>% group_by(Date, Distance) %>% filter(Race=="Yes", Terrain=="Trail", Distance > 27) %>% 
+  summarize(Pace_mph = mean(Pace)) %>% arrange(desc(Pace_mph))
+```
+
+Above shows how fast each of my trail ultras have been. Distance and pace seem to be associated, which is expected, since I have to slow down the further I run.
+
+```{r}
+dat4 %>% group_by(TimeOfDay) %>% filter(Race=="No") %>% summarize(mean_Distance = mean(Distance)) %>% 
+  arrange(desc(mean_Distance))
+dat4 %>% group_by(TimeOfDay) %>% filter(Race=="No") %>% summarize(mean_Pace = mean(Pace)) %>% 
+  arrange(desc(mean_Pace))
+```
+
+Above shows the time of day that I run fastest and furthest, not including races, because they always occur in the morning.
+
+```{r}
+dat4 %>% group_by(Terrain) %>% summarize(mean_Pace = mean(Pace)) %>% 
+  arrange(desc(mean_Pace))
+dat4 %>% group_by(Terrain) %>% summarize(mean_Distance = mean(Distance)) %>% 
+  arrange(desc(mean_Distance))
+```
+
+Above shows the type of terrain that I run fastest and furthest on.
+
+```{r}
+#does temperature or elevation affect pace?
+dat4 %>% summarize(mean_Pace = mean(Pace))
+dat4 %>% filter(ntile(Max.Temp, 100) > 75) %>% summarize(mean_Pace_hot = mean(Pace))
+dat4 %>% filter(ntile(Min.Temp, 100) <25) %>% summarize(mean_Pace_cold = mean(Pace))
+dat4 %>% filter(ntile(Elevation, 100) > 75) %>% summarize(mean_Pace_hilly = mean(Pace))
+dat4 %>% filter(ntile(Elevation, 100) <25) %>% summarize(mean_Pace_flat = mean(Pace))
+```
+
+Above shows how my hottest or coldest (75th percentile and above, or 25th percentile and below, respectively) or my hilliest and flattest (defined by the same parameters) runs differ compared to the overall average pace for all of my logged runs. It makes sense that cold or flat runs are faster and hot or hilly runs are slower.
+
+# Graphs
+
+Below is a graph showing how far and fast I go on each of the four different terrain types, on average. Taking the average of each data point made it much easier to visualize.
+
+```{r}
+dat8 <- dat4 %>% group_by(Terrain) %>% summarize(mean_Pace = mean(Pace), mean_Distance=mean(Distance))
+ggplot(data = dat8, aes(x = mean_Distance, y = mean_Pace, color = Terrain)) + theme_dark() + 
+  geom_point(size=10, shape="triangle")  + 
+  labs(x = "mean distance (miles)", y = "mean pace (mph)", 
+       title = "Mean distance and pace for different terrains")
+```
+
+As expected, treadmill and road runs have the fastest paces, on average, because they are even surfaces and therefore easier to run on than trails. Since these runs are faster, it makes sense that they have a lower average distance. Trail runs have such a high distance and low pace because all of my ultra races are on trails. As expected, mixed terrain runs lie in between that of road and trail runs, both in pace and distance.
+
+Below is a graph showing my average mileage for each month
+
+```{r}
+ggplot(data = dat5, aes(x=month, y=Distance)) +geom_bar(size=5, stat = "summary", fill="#66cdaa") + 
+  theme_dark() +
+  labs(y="Distance (miles)", title = "Average mileage over different months")
+```
+
+The massive mileage for February is because both of my 100-mile races were in Feburary. The winter months have more mileage because the weather is much more suitable for running.
+
+Below is a graph showing just ultras, which are races defined as being over 26.2 miles long. I wanted to show how pace was affected both by elevation gain and distance.
+
+```{r}
+dat7 <- dat4 %>%  filter(Race=="Yes", Terrain=="Trail", Distance > 27)
+ggplot(data = dat7, aes(x = Distance, y = Pace, fill = GainPerMile)) + theme_dark() + 
+  geom_tile(height=0.1, width=0.02)  + 
+  scale_fill_continuous(low="#c1f4e3", high="#076d4b", name = "Gain Per Mile (ft)") +
+  scale_x_log10() +
+  labs(x = "Distance (miles)", y = "Pace (mph)", 
+       title = "The effect of elevation gain per mile and distance on pace during ultras")
+```
+
+It can be seen above that there is a very clear trend between pace and distance. As distance increases, pace decreases. There is not as clear a trend between pace and elevation gain as I thought that there would be, but there are only 12 data point so that could be part of it. I used a log scale because distance is not a normally distributed variable.
+
+Below is a graph showing all data except that whose elevation gain for the whole run exceeded the average elevation gain per mile. These runs with low elevations were omitted because they obscured the visualization of the data and did not represent a "typical" run, elevation-wise. 
+
+```{r}
+dat6 <- dat4 %>% filter(Elevation > 37.9)
+ggplot(data = dat6, aes(x = Elevation, y = Pace, fill = Avg.Temp)) + theme_dark() + 
+  geom_tile(height=0.085, width=0.03, alpha=0.7)  + 
+  scale_fill_continuous(low="blue", high="red", name = "Temp") +
+  scale_x_log10() +
+labs(x = "Elevation Gain (ft)", y = "Pace (mph)", title = "The effect of elevation gain and temperature on pace")
+```
+
+It can be seen above that there is a slight trend between pace and elevation. As elevation gain increases, pace decreases. There isnot as clear a visible trend between pace and temperature as I thought there would be. I used a log scale again because elevation gain is not a normally distributed variable.
+
+# Principle Component Analysis 
+
+Below I will prepare data for PCA, and then perform the proper calculations.
+
+```{r}
+dat5<-dat4%>%filter(Elevation>0)
+pca_nums<-dat5%>%select_if(is.numeric)%>%select(-GainPerMile, -Min.Temp, -Max.Temp)%>%scale
+rownames(pca_nums)<-dat5$Date
+pca_nums=pca_nums[complete.cases(pca_nums),]
+pca<-princomp(pca_nums)
+pca
+```
+
+Now, I will determine how many PC's to keep.
+
+```{r}
+#method 1 of determining PC's to keep
+eigval<-pca$sdev^2
+eigval
+#method 2 of determining how to keep PC's
+round(cumsum(eigval)/sum(eigval),2) 
+#proportion of var explained by each PC, method 3 (keep 4)
+varprop=round(eigval/sum(eigval),2)
+ggplot()+geom_bar(aes(y=varprop,x=1:5),stat="identity")+xlab("")+geom_path(aes(y=varprop,x=1:5))+  
+  geom_text(aes(x=1:5,y=varprop,label=round(varprop,2)),vjust=1,col="white",size=5)+  
+  scale_y_continuous(breaks=seq(0,.6,.2),labels = scales::percent)+  scale_x_continuous(breaks=1:10)
+```
+
+From method 1, we can see that the first 2 PC's have eigenvalues greater than 1. From method 2, we can see that it takes the first 3 PC's before the cumulative variance gets to 80%. From method 3, we can see the graph levels off after 2 PC's. Thus, 2 PC's should be kept.
+
+Now I will interpret the PC's.
+
+```{r}
+summary(pca, loadings=T)
+```
+
+PC1 is a Distance/Time/Elevation vs Pace axis. Higher scores on PC1 indicate a greater distance, duration, and elevation gain, but a slower pace. PC2 is a Pace vs. Average Temperature axis. Higher scores on PC2 inidcate a faster pace and a lower average temperature. PC5 is a Distance vs. Time axis. Higher scores on PC5 indicate a greater distance but a shorter duration.
+
+Now I will visualize the PC's. Below is the PC scores plot.
+
+```{r}
+ggplot()+geom_point(aes(pca$scores[,1], pca$scores[,2]))+xlab("PC1")+ylab("PC2")
+```
+
+Below is the loadings plot.
+
+```{r}
+pca$loadings[1:5,1:2]%>%as.data.frame%>%rownames_to_column%>%
+  ggplot()+geom_hline(aes(yintercept=0),lty=2)+
+  geom_vline(aes(xintercept=0),lty=2)+ylab("PC2")+xlab("PC1")+
+  geom_segment(aes(x=0,y=0,xend=Comp.1,yend=Comp.2),arrow=arrow(),col="red")+
+  geom_label(aes(x=Comp.1*1.1,y=Comp.2*1.1,label=rowname))
+```
+
+The minimum angle is between time and elevation, followed closely by time and distance. Thus, these two variables are the most correlated with each other. Pace points nearly in the opposite direction of Time, Distance, and Elevation, meaning that it is negatively correlated with these variables. Average Temperatture is more correlated with Pace than with the other 3 variables, but it is not significantly correlated with or against any of the other variables to a high degree.

@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="author" content="Amber Ellsworth" />
+    
+    <link rel="shortcut icon" type="image/x-icon" href="/img/favicon.ico">
+    <title>Project 1: Running and Weather Data Visualization</title>
+    <meta name="generator" content="Hugo 0.61.0" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="/css/main.css" />
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,400,200bold,400old" />
+    
+    <!--[if lt IE 9]>
+			<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+			<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+		<![endif]-->
+
+    
+  </head>
+
+  <body>
+    <div id="wrap">
+
+      
+      <nav class="navbar navbar-default">
+  <div class="container">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="/"><i class="fa fa-home"></i></a>
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <div class="navbar-collapse collapse" id="navbar">
+      <ul class="nav navbar-nav navbar-right">
+      
+        
+        <li><a href="/blog/">BLOG</a></li>
+        
+        <li><a href="/projects/">PROJECTS</a></li>
+        
+      
+      </ul>
+    </div>
+  </div>
+</nav>
+
+      
+      <div class="container">
+        <div class="blog-post">
+          <h3>
+            <strong><a href="/project1/">Project 1: Running and Weather Data Visualization</a></strong>
+          </h3>
+        </div>
+        <div class="blog-title">
+          <h4>
+          January 1, 0001
+            &nbsp;&nbsp;
+            
+          </h4>
+        </div>
+        <div class="panel panel-default">
+          <div class="panel-body">
+            <div class="blogpost">
+              
+
+
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
+<p>Below are the two data sets that I will be merging and investigating for this project.</p>
+<p>The first dataset, Strava_Data, I collected manually from an app I have on my phone that tracks my running. I have been using the app since Octtober of 2017, so I collected data from every single run I have recorded since then up until October 1st of this year, which has been 619 runs. For each run, I collected data on:</p>
+<p>when I ran (date, time of day, and day)</p>
+<p>where I ran (location)</p>
+<p>how far I ran (distance)</p>
+<p>how long it took (time)</p>
+<p>my average pace in miles per hour</p>
+<p>my total elevation gain in feet</p>
+<p>the type of terrain that I ran on, which was either treadmill, road, trail, or mixed(trail and road on the same run)</p>
+<p>whether or not it was a race</p>
+<p>temperature data for locations other than Austin, looked up manually</p>
+<p>The second dataset I got from NOAA. It has the minimum, average, and maximum daily temperatures in Austin, as recorded from the Camp Mabry weather station.</p>
+<pre class="r"><code>Strava_Data1 &lt;- read_csv(&quot;Strava Data1.csv&quot;, 
+    col_types = cols(Avg.Temp = col_number(), 
+        Date = col_date(format = &quot;%m/%d/%Y&quot;), 
+        Distance = col_number(), Elevation = col_number(), 
+        Max.Temp = col_number(), Min.Temp = col_number(), 
+        Pace = col_number(), Time = col_number()))
+Weather_Data &lt;- read_csv(&quot;Weather Data.csv&quot;, 
+    col_types = cols(Avg.Temp = col_number(), 
+        Date = col_date(format = &quot;%m/%d/%Y&quot;), 
+        Max.Temp = col_number(), Min.Temp = col_number()))
+head(Strava_Data1)</code></pre>
+<pre><code>## # A tibble: 6 x 13
+##   Date       Day   TimeOfDay Location Distance  Time  Pace Elevation
+##   &lt;date&gt;     &lt;chr&gt; &lt;chr&gt;     &lt;chr&gt;       &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;
+## 1 2019-09-30 Mond~ Evening   Austin       7.19  1.12   6.4       297
+## 2 2019-09-29 Sund~ Morning   Austin      14.7   2.27   6.5       816
+## 3 2019-09-28 Satu~ Morning   Austin       9.2   1.61   5.7       305
+## 4 2019-09-27 Frid~ Evening   Austin       6.01  0.84   7.2       266
+## 5 2019-09-27 Frid~ Midday    Austin       7.01  1      7         179
+## 6 2019-09-26 Thur~ Morning   Austin       8.25  1.38   6         646
+## # ... with 5 more variables: Terrain &lt;chr&gt;, Race &lt;chr&gt;, Min.Temp &lt;dbl&gt;,
+## #   Avg.Temp &lt;dbl&gt;, Max.Temp &lt;dbl&gt;</code></pre>
+<pre class="r"><code>head(Weather_Data)</code></pre>
+<pre><code>## # A tibble: 6 x 4
+##   Date       Min.Temp Avg.Temp Max.Temp
+##   &lt;date&gt;        &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;
+## 1 2019-09-30       80       90       99
+## 2 2019-09-29       77       88       98
+## 3 2019-09-28       79       88       96
+## 4 2019-09-27       75       87       99
+## 5 2019-09-26       75       87       98
+## 6 2019-09-25       75       88      100</code></pre>
+<div id="joining-datasets" class="section level2">
+<h2>Joining Datasets</h2>
+<pre class="r"><code>dat &lt;- Strava_Data1 %&gt;% filter(is.na(Min.Temp))
+weatherdat2 &lt;- Weather_Data %&gt;% rename(minimum.temp=Min.Temp, average.temp=Avg.Temp, maximum.temp=Max.Temp)
+dat1 &lt;- inner_join(dat, weatherdat2, by=&quot;Date&quot;)
+dat2 &lt;- dat1 %&gt;% select(-Min.Temp, -Max.Temp, -Avg.Temp)
+dat3 &lt;- left_join(Strava_Data1, dat2)</code></pre>
+<pre><code>## Joining, by = c(&quot;Date&quot;, &quot;Day&quot;, &quot;TimeOfDay&quot;, &quot;Location&quot;, &quot;Distance&quot;, &quot;Time&quot;, &quot;Pace&quot;, &quot;Elevation&quot;, &quot;Terrain&quot;, &quot;Race&quot;)</code></pre>
+<pre class="r"><code>dat3$Min.Temp = ifelse(is.na(dat3$Min.Temp), paste(dat3$minimum.temp),paste(dat3$Min.Temp))
+dat3$Avg.Temp = ifelse(is.na(dat3$Avg.Temp), paste(dat3$average.temp),paste(dat3$Avg.Temp))
+dat3$Max.Temp = ifelse(is.na(dat3$Max.Temp), paste(dat3$maximum.temp),paste(dat3$Max.Temp))
+dat4 &lt;- dat3 %&gt;% select(-minimum.temp, -average.temp, -maximum.temp)
+dat4$Avg.Temp &lt;- as.numeric(dat4$Avg.Temp)
+dat4$Min.Temp &lt;- as.numeric(dat4$Min.Temp)
+dat4$Max.Temp &lt;- as.numeric(dat4$Max.Temp)</code></pre>
+<p>I used both a left join and an inner join.</p>
+</div>
+<div id="tidying-data" class="section level2">
+<h2>Tidying Data</h2>
+<pre class="r"><code>dat5&lt;- dat4 %&gt;%  separate(Date, c(&#39;year&#39;,&#39;month&#39;,&#39;day&#39;), sep = &quot;-&quot;, remove = TRUE)</code></pre>
+<p>To tidy the data, I separated date into year, month, and date, so that I have the option to manipulate the data based on a specific month or year if I want.</p>
+</div>
+<div id="mutating-data" class="section level2">
+<h2>Mutating Data</h2>
+<pre class="r"><code>dat4 &lt;- dat4 %&gt;% mutate(GainPerMile=Elevation/Distance)</code></pre>
+<p>I added the variable GainPerMile, which shows the average elevation gain per mile of each run. This is useful because elevation naturally varies with distance, because the further I run, the more elevation I’m going to gain. Gain per mile allows a better estimate of how “hilly” a run actually is.</p>
+</div>
+<div id="the-means-and-standard-deviations-of-each-numeric-variable." class="section level2">
+<h2>The means and standard deviations of each numeric variable.</h2>
+<pre class="r"><code>dat4 %&gt;% summarise_if(is.numeric, mean)</code></pre>
+<pre><code>## # A tibble: 1 x 8
+##   Distance  Time  Pace Elevation Min.Temp Avg.Temp Max.Temp GainPerMile
+##      &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;       &lt;dbl&gt;
+## 1     7.46  1.39  5.74      296.       NA       NA       NA        37.8</code></pre>
+<pre class="r"><code>dat4 %&gt;% summarise_if(is.numeric, sd)</code></pre>
+<pre><code>## # A tibble: 1 x 8
+##   Distance  Time  Pace Elevation Min.Temp Avg.Temp Max.Temp GainPerMile
+##      &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;       &lt;dbl&gt;
+## 1     8.20  2.17 0.607      453.      NaN      NaN      NaN        22.7</code></pre>
+</div>
+</div>
+<div id="quick-stats" class="section level1">
+<h1>Quick Stats</h1>
+<pre class="r"><code>dat4 %&gt;% group_by(Day) %&gt;% summarize(mean_Distance = mean(Distance)) %&gt;% 
+  arrange(desc(mean_Distance))</code></pre>
+<pre><code>## # A tibble: 7 x 2
+##   Day       mean_Distance
+##   &lt;chr&gt;             &lt;dbl&gt;
+## 1 Saturday          13.4 
+## 2 Friday             8.27
+## 3 Sunday             6.97
+## 4 Thursday           5.86
+## 5 Tuesday            5.82
+## 6 Monday             5.80
+## 7 Wednesday          5.48</code></pre>
+<p>Above shows the mean distance I run on each day of the week. Most of my races occur on Saturday’s, and I rarelt have Friday classes, so it makes sense that those two are the highest.</p>
+<pre class="r"><code>dat4 %&gt;% group_by(Location) %&gt;% 
+  filter(Location==&quot;Austin&quot;) %&gt;% 
+  summarize(mean_Pace = mean(Pace)) %&gt;% 
+  arrange(desc(mean_Pace))</code></pre>
+<pre><code>## # A tibble: 1 x 2
+##   Location mean_Pace
+##   &lt;chr&gt;        &lt;dbl&gt;
+## 1 Austin        5.77</code></pre>
+<p>Above shows where I have ran the fastest, out of my runs in Austin.</p>
+<pre class="r"><code>dat4 %&gt;% group_by(Date, Distance) %&gt;% filter(Race==&quot;Yes&quot;, Terrain==&quot;Trail&quot;, Distance &gt; 27) %&gt;% 
+  summarize(Pace_mph = mean(Pace)) %&gt;% arrange(desc(Pace_mph))</code></pre>
+<pre><code>## # A tibble: 12 x 3
+## # Groups:   Date [12]
+##    Date       Distance Pace_mph
+##    &lt;date&gt;        &lt;dbl&gt;    &lt;dbl&gt;
+##  1 2018-10-27     32.6      6  
+##  2 2017-11-18     30.2      5.6
+##  3 2018-03-10     31.0      5.2
+##  4 2017-12-09     51.0      5.1
+##  5 2018-01-14     30.2      5.1
+##  6 2018-02-24     29        4.8
+##  7 2018-11-17     51.3      4.5
+##  8 2018-12-08     67        4.5
+##  9 2018-04-07     60.2      4.3
+## 10 2019-05-25     67.6      3.7
+## 11 2019-02-02     98.6      3.3
+## 12 2019-02-22    100        3.2</code></pre>
+<p>Above shows how fast each of my trail ultras have been. Distance and pace seem to be associated, which is expected, since I have to slow down the further I run.</p>
+<pre class="r"><code>dat4 %&gt;% group_by(TimeOfDay) %&gt;% filter(Race==&quot;No&quot;) %&gt;% summarize(mean_Distance = mean(Distance)) %&gt;% 
+  arrange(desc(mean_Distance))</code></pre>
+<pre><code>## # A tibble: 5 x 2
+##   TimeOfDay mean_Distance
+##   &lt;chr&gt;             &lt;dbl&gt;
+## 1 Morning            7.38
+## 2 Midday             6.09
+## 3 Evening            5.50
+## 4 Afternoon          5.19
+## 5 Night              3.90</code></pre>
+<pre class="r"><code>dat4 %&gt;% group_by(TimeOfDay) %&gt;% filter(Race==&quot;No&quot;) %&gt;% summarize(mean_Pace = mean(Pace)) %&gt;% 
+  arrange(desc(mean_Pace))</code></pre>
+<pre><code>## # A tibble: 5 x 2
+##   TimeOfDay mean_Pace
+##   &lt;chr&gt;         &lt;dbl&gt;
+## 1 Evening        5.86
+## 2 Afternoon      5.85
+## 3 Midday         5.83
+## 4 Morning        5.67
+## 5 Night          5.51</code></pre>
+<p>Above shows the time of day that I run fastest and furthest, not including races, because they always occur in the morning.</p>
+<pre class="r"><code>dat4 %&gt;% group_by(Terrain) %&gt;% summarize(mean_Pace = mean(Pace)) %&gt;% 
+  arrange(desc(mean_Pace))</code></pre>
+<pre><code>## # A tibble: 4 x 2
+##   Terrain   mean_Pace
+##   &lt;chr&gt;         &lt;dbl&gt;
+## 1 Treadmill      5.87
+## 2 Road           5.82
+## 3 Mixed          5.78
+## 4 Trail          5.61</code></pre>
+<pre class="r"><code>dat4 %&gt;% group_by(Terrain) %&gt;% summarize(mean_Distance = mean(Distance)) %&gt;% 
+  arrange(desc(mean_Distance))</code></pre>
+<pre><code>## # A tibble: 4 x 2
+##   Terrain   mean_Distance
+##   &lt;chr&gt;             &lt;dbl&gt;
+## 1 Trail             10.7 
+## 2 Mixed              7.34
+## 3 Treadmill          4.8 
+## 4 Road               4.78</code></pre>
+<p>Above shows the type of terrain that I run fastest and furthest on.</p>
+<pre class="r"><code>#does temperature or elevation affect pace?
+dat4 %&gt;% summarize(mean_Pace = mean(Pace))</code></pre>
+<pre><code>## # A tibble: 1 x 1
+##   mean_Pace
+##       &lt;dbl&gt;
+## 1      5.74</code></pre>
+<pre class="r"><code>dat4 %&gt;% filter(ntile(Max.Temp, 100) &gt; 75) %&gt;% summarize(mean_Pace_hot = mean(Pace))</code></pre>
+<pre><code>## # A tibble: 1 x 1
+##   mean_Pace_hot
+##           &lt;dbl&gt;
+## 1          5.68</code></pre>
+<pre class="r"><code>dat4 %&gt;% filter(ntile(Min.Temp, 100) &lt;25) %&gt;% summarize(mean_Pace_cold = mean(Pace))</code></pre>
+<pre><code>## # A tibble: 1 x 1
+##   mean_Pace_cold
+##            &lt;dbl&gt;
+## 1           5.88</code></pre>
+<pre class="r"><code>dat4 %&gt;% filter(ntile(Elevation, 100) &gt; 75) %&gt;% summarize(mean_Pace_hilly = mean(Pace))</code></pre>
+<pre><code>## # A tibble: 1 x 1
+##   mean_Pace_hilly
+##             &lt;dbl&gt;
+## 1            5.61</code></pre>
+<pre class="r"><code>dat4 %&gt;% filter(ntile(Elevation, 100) &lt;25) %&gt;% summarize(mean_Pace_flat = mean(Pace))</code></pre>
+<pre><code>## # A tibble: 1 x 1
+##   mean_Pace_flat
+##            &lt;dbl&gt;
+## 1           5.86</code></pre>
+<p>Above shows how my hottest or coldest (75th percentile and above, or 25th percentile and below, respectively) or my hilliest and flattest (defined by the same parameters) runs differ compared to the overall average pace for all of my logged runs. It makes sense that cold or flat runs are faster and hot or hilly runs are slower.</p>
+</div>
+<div id="graphs" class="section level1">
+<h1>Graphs</h1>
+<p>Below is a graph showing how far and fast I go on each of the four different terrain types, on average. Taking the average of each data point made it much easier to visualize.</p>
+<pre class="r"><code>dat8 &lt;- dat4 %&gt;% group_by(Terrain) %&gt;% summarize(mean_Pace = mean(Pace), mean_Distance=mean(Distance))
+ggplot(data = dat8, aes(x = mean_Distance, y = mean_Pace, color = Terrain)) + theme_dark() + 
+  geom_point(size=10, shape=&quot;triangle&quot;)  + 
+  labs(x = &quot;mean distance (miles)&quot;, y = &quot;mean pace (mph)&quot;, 
+       title = &quot;Mean distance and pace for different terrains&quot;)</code></pre>
+<p><img src="/project1_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
+<p>As expected, treadmill and road runs have the fastest paces, on average, because they are even surfaces and therefore easier to run on than trails. Since these runs are faster, it makes sense that they have a lower average distance. Trail runs have such a high distance and low pace because all of my ultra races are on trails. As expected, mixed terrain runs lie in between that of road and trail runs, both in pace and distance.</p>
+<p>Below is a graph showing my average mileage for each month</p>
+<pre class="r"><code>ggplot(data = dat5, aes(x=month, y=Distance)) +geom_bar(size=5, stat = &quot;summary&quot;, fill=&quot;#66cdaa&quot;) + 
+  theme_dark() +
+  labs(y=&quot;Distance (miles)&quot;, title = &quot;Average mileage over different months&quot;)</code></pre>
+<pre><code>## No summary function supplied, defaulting to `mean_se()</code></pre>
+<p><img src="/project1_files/figure-html/unnamed-chunk-14-1.png" width="672" /></p>
+<p>The massive mileage for February is because both of my 100-mile races were in Feburary. The winter months have more mileage because the weather is much more suitable for running.</p>
+<p>Below is a graph showing just ultras, which are races defined as being over 26.2 miles long. I wanted to show how pace was affected both by elevation gain and distance.</p>
+<pre class="r"><code>dat7 &lt;- dat4 %&gt;%  filter(Race==&quot;Yes&quot;, Terrain==&quot;Trail&quot;, Distance &gt; 27)
+ggplot(data = dat7, aes(x = Distance, y = Pace, fill = GainPerMile)) + theme_dark() + 
+  geom_tile(height=0.1, width=0.02)  + 
+  scale_fill_continuous(low=&quot;#c1f4e3&quot;, high=&quot;#076d4b&quot;, name = &quot;Gain Per Mile (ft)&quot;) +
+  scale_x_log10() +
+  labs(x = &quot;Distance (miles)&quot;, y = &quot;Pace (mph)&quot;, 
+       title = &quot;The effect of elevation gain per mile and distance on pace during ultras&quot;)</code></pre>
+<p><img src="/project1_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
+<p>It can be seen above that there is a very clear trend between pace and distance. As distance increases, pace decreases. There is not as clear a trend between pace and elevation gain as I thought that there would be, but there are only 12 data point so that could be part of it. I used a log scale because distance is not a normally distributed variable.</p>
+<p>Below is a graph showing all data except that whose elevation gain for the whole run exceeded the average elevation gain per mile. These runs with low elevations were omitted because they obscured the visualization of the data and did not represent a “typical” run, elevation-wise.</p>
+<pre class="r"><code>dat6 &lt;- dat4 %&gt;% filter(Elevation &gt; 37.9)
+ggplot(data = dat6, aes(x = Elevation, y = Pace, fill = Avg.Temp)) + theme_dark() + 
+  geom_tile(height=0.085, width=0.03, alpha=0.7)  + 
+  scale_fill_continuous(low=&quot;blue&quot;, high=&quot;red&quot;, name = &quot;Temp&quot;) +
+  scale_x_log10() +
+labs(x = &quot;Elevation Gain (ft)&quot;, y = &quot;Pace (mph)&quot;, title = &quot;The effect of elevation gain and temperature on pace&quot;)</code></pre>
+<p><img src="/project1_files/figure-html/unnamed-chunk-16-1.png" width="672" /></p>
+<p>It can be seen above that there is a slight trend between pace and elevation. As elevation gain increases, pace decreases. There isnot as clear a visible trend between pace and temperature as I thought there would be. I used a log scale again because elevation gain is not a normally distributed variable.</p>
+</div>
+<div id="principle-component-analysis" class="section level1">
+<h1>Principle Component Analysis</h1>
+<p>Below I will prepare data for PCA, and then perform the proper calculations.</p>
+<pre class="r"><code>dat5&lt;-dat4%&gt;%filter(Elevation&gt;0)
+pca_nums&lt;-dat5%&gt;%select_if(is.numeric)%&gt;%select(-GainPerMile, -Min.Temp, -Max.Temp)%&gt;%scale
+rownames(pca_nums)&lt;-dat5$Date
+pca_nums=pca_nums[complete.cases(pca_nums),]
+pca&lt;-princomp(pca_nums)
+pca</code></pre>
+<pre><code>## Call:
+## princomp(x = pca_nums)
+## 
+## Standard deviations:
+##    Comp.1    Comp.2    Comp.3    Comp.4    Comp.5 
+## 1.6914327 1.0440405 0.8540181 0.5615472 0.1484247 
+## 
+##  5  variables and  548 observations.</code></pre>
+<p>Now, I will determine how many PC’s to keep.</p>
+<pre class="r"><code>#method 1 of determining PC&#39;s to keep
+eigval&lt;-pca$sdev^2
+eigval</code></pre>
+<pre><code>##     Comp.1     Comp.2     Comp.3     Comp.4     Comp.5 
+## 2.86094457 1.09002052 0.72934691 0.31533522 0.02202991</code></pre>
+<pre class="r"><code>#method 2 of determining how to keep PC&#39;s
+round(cumsum(eigval)/sum(eigval),2) </code></pre>
+<pre><code>## Comp.1 Comp.2 Comp.3 Comp.4 Comp.5 
+##   0.57   0.79   0.93   1.00   1.00</code></pre>
+<pre class="r"><code>#proportion of var explained by each PC, method 3 (keep 4)
+varprop=round(eigval/sum(eigval),2)
+ggplot()+geom_bar(aes(y=varprop,x=1:5),stat=&quot;identity&quot;)+xlab(&quot;&quot;)+geom_path(aes(y=varprop,x=1:5))+  
+  geom_text(aes(x=1:5,y=varprop,label=round(varprop,2)),vjust=1,col=&quot;white&quot;,size=5)+  
+  scale_y_continuous(breaks=seq(0,.6,.2),labels = scales::percent)+  scale_x_continuous(breaks=1:10)</code></pre>
+<p><img src="/project1_files/figure-html/unnamed-chunk-18-1.png" width="672" /></p>
+<p>From method 1, we can see that the first 2 PC’s have eigenvalues greater than 1. From method 2, we can see that it takes the first 3 PC’s before the cumulative variance gets to 80%. From method 3, we can see the graph levels off after 2 PC’s. Thus, 2 PC’s should be kept.</p>
+<p>Now I will interpret the PC’s.</p>
+<pre class="r"><code>summary(pca, loadings=T)</code></pre>
+<pre><code>## Importance of components:
+##                           Comp.1    Comp.2    Comp.3     Comp.4
+## Standard deviation     1.6914327 1.0440405 0.8540181 0.56154717
+## Proportion of Variance 0.5701731 0.2172361 0.1453555 0.06284486
+## Cumulative Proportion  0.5701731 0.7874092 0.9327647 0.99560954
+##                             Comp.5
+## Standard deviation     0.148424747
+## Proportion of Variance 0.004390459
+## Cumulative Proportion  1.000000000
+## 
+## Loadings:
+##           Comp.1 Comp.2 Comp.3 Comp.4 Comp.5
+## Distance   0.570  0.107  0.140  0.376  0.709
+## Time       0.573                0.410 -0.702
+## Pace      -0.298  0.480  0.818  0.101       
+## Elevation  0.508         0.261 -0.819       
+## Avg.Temp         -0.867  0.487</code></pre>
+<p>PC1 is a Distance/Time/Elevation vs Pace axis. Higher scores on PC1 indicate a greater distance, duration, and elevation gain, but a slower pace. PC2 is a Pace vs. Average Temperature axis. Higher scores on PC2 inidcate a faster pace and a lower average temperature. PC5 is a Distance vs. Time axis. Higher scores on PC5 indicate a greater distance but a shorter duration.</p>
+<p>Now I will visualize the PC’s. Below is the PC scores plot.</p>
+<pre class="r"><code>ggplot()+geom_point(aes(pca$scores[,1], pca$scores[,2]))+xlab(&quot;PC1&quot;)+ylab(&quot;PC2&quot;)</code></pre>
+<p><img src="/project1_files/figure-html/unnamed-chunk-20-1.png" width="672" /></p>
+<p>Below is the loadings plot.</p>
+<pre class="r"><code>pca$loadings[1:5,1:2]%&gt;%as.data.frame%&gt;%rownames_to_column%&gt;%
+  ggplot()+geom_hline(aes(yintercept=0),lty=2)+
+  geom_vline(aes(xintercept=0),lty=2)+ylab(&quot;PC2&quot;)+xlab(&quot;PC1&quot;)+
+  geom_segment(aes(x=0,y=0,xend=Comp.1,yend=Comp.2),arrow=arrow(),col=&quot;red&quot;)+
+  geom_label(aes(x=Comp.1*1.1,y=Comp.2*1.1,label=rowname))</code></pre>
+<p><img src="/project1_files/figure-html/unnamed-chunk-21-1.png" width="672" /></p>
+<p>The minimum angle is between time and elevation, followed closely by time and distance. Thus, these two variables are the most correlated with each other. Pace points nearly in the opposite direction of Time, Distance, and Elevation, meaning that it is negatively correlated with these variables. Average Temperatture is more correlated with Pace than with the other 3 variables, but it is not significantly correlated with or against any of the other variables to a high degree.</p>
+</div>
+
+              <hr>
+              <div class="related-posts">
+                <h5>Related Posts</h5>
+                
+              </div>
+            </div>
+          </div>
+          <hr>
+        <div class="disqus">
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+
+    (function() {
+      
+      
+      if (window.location.hostname == "localhost")
+        return;
+
+      var disqus_shortname = '';
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com/" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div>
+        </div>
+      </div>
+      
+    </div>
+
+    
+    <footer>
+  <div id="footer">
+    <div class="container">
+      <p class="text-muted">&copy; All rights reserved. Powered by <a href="https://gohugo.io/">Hugo</a> and
+      <a href="http://www.github.com/nurlansu/hugo-sustain/">sustain</a> with ♥</p>
+    </div>
+  </div>
+</footer>
+<div class="footer"></div>
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+<script src="/js/docs.min.js"></script>
+<script src="/js/main.js"></script>
+
+<script src="/js/ie10-viewport-bug-workaround.js"></script>
+
+
+    
+  </body>
+</html>

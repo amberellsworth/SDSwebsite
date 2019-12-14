@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Blogs on Chris Turner</title>
+    <link>/blog/</link>
+    <description>Recent content in Blogs on Chris Turner</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-US</language>
+    <lastBuildDate>Fri, 13 Dec 2019 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="/blog/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Brazos Bend 100 Race Report</title>
+      <link>/blog/brazos-bend-100-race-report/</link>
+      <pubDate>Fri, 13 Dec 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/blog/brazos-bend-100-race-report/</guid>
+      <description>I have completed over 30 races in the past few years, and last December, I DNF’ed (Did Not Finish) for the first, and only, time ever at the 2018 Brazos Bend 100-miler. It was my first attempt at 100 miles, and despite my best physical preparation, I ultimately gave up mentally due to the muddy, wet, and cold conditions.
+Since then, I have been determined to come back to run Brazos in 2019 for redemption.</description>
+    </item>
+    
+    <item>
+      <title>Genome Evolution and BioPython</title>
+      <link>/blog/genome-evolution-and-biopython/</link>
+      <pubDate>Mon, 09 Dec 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/blog/genome-evolution-and-biopython/</guid>
+      <description>Next semester, I will be working for the “Breseq” project in Dr.Barrick’s lab at UT Austin.
+Breseq is a “computational pipeline” that allows one to search for mutations in microbrial-sized genomes (most notably, with E.coli), relative to a reference sequence.
+By comparing sequence mutations, several parameters can be calculated in order to identify rates of genome evolution. For instance, we could evolve E.coli at several different temperatures and compare the differential rates of say, point subsitutions in their genomes to determine whether temperature has an effect on genotype and/or phenotype.</description>
+    </item>
+    
+    <item>
+      <title>Your cat is more unique than you think</title>
+      <link>/blog/your-cat-is-more-unique-than-you-think/</link>
+      <pubDate>Thu, 05 Dec 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/blog/your-cat-is-more-unique-than-you-think/</guid>
+      <description>We all love cats, or at least we all should. My cat, Storm, is especially amazing. She’s a sassy, friendly, and inquisitive 2-year-old tortiose-shell.
+Toriose-shells and calicos both undergo an amazing phenomenon in regards to their fur patterns that makes it impossible to clone them and get the same pattern in the progeny!
+There are some traits that animals can have that are “sex-linked” - that is, they reside on the X chromosome.</description>
+    </item>
+    
+  </channel>
+</rss>

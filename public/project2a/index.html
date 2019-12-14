@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="author" content="Amber Ellsworth" />
+    
+    <link rel="shortcut icon" type="image/x-icon" href="/img/favicon.ico">
+    <title>Project 2: Modeling, Testing, and Predicting</title>
+    <meta name="generator" content="Hugo 0.61.0" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="/css/main.css" />
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,400,200bold,400old" />
+    
+    <!--[if lt IE 9]>
+			<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+			<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+		<![endif]-->
+
+    
+  </head>
+
+  <body>
+    <div id="wrap">
+
+      
+      <nav class="navbar navbar-default">
+  <div class="container">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="/"><i class="fa fa-home"></i></a>
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <div class="navbar-collapse collapse" id="navbar">
+      <ul class="nav navbar-nav navbar-right">
+      
+        
+        <li><a href="/blog/">BLOG</a></li>
+        
+        <li><a href="/projects/">PROJECTS</a></li>
+        
+      
+      </ul>
+    </div>
+  </div>
+</nav>
+
+      
+      <div class="container">
+        <div class="blog-post">
+          <h3>
+            <strong><a href="/project2a/">Project 2: Modeling, Testing, and Predicting</a></strong>
+          </h3>
+        </div>
+        <div class="blog-title">
+          <h4>
+          January 1, 0001
+            &nbsp;&nbsp;
+            
+          </h4>
+        </div>
+        <div class="panel panel-default">
+          <div class="panel-body">
+            <div class="blogpost">
+              
+
+
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
+<div id="strava-data" class="section level2">
+<h2>Strava Data</h2>
+<p>Strava is an app that records running activities via GPS. I have had this app for the past 25 months, and have compiled all of the data from every run I have completed in that time. For each run, I have recroded the:</p>
+<p>-Date that I ran</p>
+<p>-Time of day that I ran (Morning was classified as before 11 AM, Midday was classified as 11 AM - 2PM, Afternoon was classified as 2 - 5 PM, Evening was classified as 5 - 9 PM, and Night was classified as after 9 PM.)</p>
+<p>-Location of the run</p>
+<p>-Distance I ran, in miles</p>
+<p>-Duration of the run, in hours</p>
+<p>-Average pace in miles per hour of the run</p>
+<p>-Elevation gain during the run</p>
+<p>-Type of terrain that I ran on (either road, trail, a mix of the two, or treadmill)</p>
+<p>-And whether or not the run was a race</p>
+</div>
+</div>
+<div id="manova" class="section level1">
+<h1>MANOVA</h1>
+<pre class="r"><code>man1&lt;-manova(cbind(Distance, Pace, Elevation)~Terrain, data=Strava_Data)
+summary(man1)</code></pre>
+<pre><code>## Df Pillai approx F num Df den Df Pr(&gt;F)
+## Terrain 3 0.15066 11.316 9 1926 &lt; 2.2e-16 ***
+## Residuals 642
+## ---
+## Signif. codes: 0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1
+&#39; &#39; 1</code></pre>
+<p>The p-value is significant, so univariate ANOVAs need to be ran in order to see which numeric variables are significant.</p>
+<pre class="r"><code>summary.aov(man1)</code></pre>
+<pre><code>## Response Distance :
+## Df Sum Sq Mean Sq F value Pr(&gt;F)
+## Terrain 3 4432 1477.45 23.198 2.884e-14 ***
+## Residuals 642 40889 63.69
+## ---
+## Signif. codes: 0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1
+&#39; &#39; 1
+##
+## Response Pace :
+## Df Sum Sq Mean Sq F value Pr(&gt;F)
+## Terrain 3 8.906 2.96856 7.5061 6.072e-05 ***
+## Residuals 642 253.901 0.39548
+## ---
+## Signif. codes: 0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1
+&#39; &#39; 1
+##
+## Response Elevation :
+## Df Sum Sq Mean Sq F value Pr(&gt;F)
+## Terrain 3 11914619 3971540 21.278 3.767e-13 ***
+## Residuals 642 119827520 186647
+## ---
+## Signif. codes: 0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1
+&#39; &#39; 1</code></pre>
+<p>The p-values of the ANOVA’s for all 3 numeric variables are significant, so post-hoc t-tests need to be done for each in order to determine which terrains signficantly differ in either average pace, elevation gain, or distance.</p>
+<pre class="r"><code>pairwise.t.test(Strava_Data$Distance,Strava_Data$Terrain,
+p.adj=&quot;none&quot;)</code></pre>
+<pre><code>## 
+##  Pairwise comparisons using t tests with pooled SD 
+## 
+## data:  Strava_Data$Distance and Strava_Data$Terrain 
+## 
+##           Trail   Mixed  Road  
+## Mixed     3.2e-05 -      -     
+## Road      2.7e-14 0.0023 -     
+## Treadmill 9.8e-08 0.0242 0.9266
+## 
+## P value adjustment method: none</code></pre>
+<pre class="r"><code>pairwise.t.test(Strava_Data$Pace,Strava_Data$Terrain,
+p.adj=&quot;none&quot;)</code></pre>
+<pre><code>## 
+##  Pairwise comparisons using t tests with pooled SD 
+## 
+## data:  Strava_Data$Pace and Strava_Data$Terrain 
+## 
+##           Trail   Mixed  Road  
+## Mixed     0.0169  -      -     
+## Road      1.6e-05 0.0986 -     
+## Treadmill 0.0013  0.1506 0.7817
+## 
+## P value adjustment method: none</code></pre>
+<pre class="r"><code>pairwise.t.test(Strava_Data$Elevation,Strava_Data$Terrain,
+p.adj=&quot;none&quot;)</code></pre>
+<pre><code>## 
+##  Pairwise comparisons using t tests with pooled SD 
+## 
+## data:  Strava_Data$Elevation and Strava_Data$Terrain 
+## 
+##           Trail   Mixed   Road   
+## Mixed     0.01749 -       -      
+## Road      4.6e-08 0.00590 -      
+## Treadmill 2.4e-12 2.5e-07 0.00081
+## 
+## P value adjustment method: none</code></pre>
+<p>At this point I have conducted 22 tests. The probability of a Type I error is equal to 1 - (1-0.05)^22 = 0.6765. Thus, the alpha level needs to be adjusted. Using the Bonferroni correction, the new alpha value = 0.05/22 = 0.00227.</p>
+<p>Now, to discuss the significance of the t-tests after adjusting for the new p-value.</p>
+<p>From the t-tests, there were 9 total significant p-values, and 9 non-significant p-values.</p>
+<div id="for-distance" class="section level2">
+<h2>For distance:</h2>
+<p>The average distance of runs differed significantly between:</p>
+<p>-trail and mixed terrain</p>
+<p>-trail and road terrain</p>
+<p>-trail and treadmill terrain</p>
+</div>
+<div id="for-pace" class="section level2">
+<h2>For pace:</h2>
+<p>The average pace of runs differed significantly between:</p>
+<p>-trail and road terrain</p>
+<p>-trail and treadmill terrain</p>
+</div>
+<div id="for-elevation" class="section level2">
+<h2>For elevation</h2>
+<p>The average elevation gain of runs differed significantly between:</p>
+<p>-trail and road terrain</p>
+<p>-treadmill and trail terrain</p>
+<p>-treadmill and mixed terrain</p>
+<p>-treadmill and road terrain</p>
+</div>
+<div id="assumptions" class="section level2">
+<h2>Assumptions</h2>
+<p>One of the assumptions for a MANOVA is Multivariate Normality.</p>
+<pre class="r"><code>ggplot(Strava_Data, aes(x = Distance, y = Pace)) +
+geom_point(alpha = .5) + geom_density_2d(h=3) + facet_wrap(~Terrain)</code></pre>
+<p><img src="/Project2a_files/figure-html/unnamed-chunk-4-1.png" width="768" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>ggplot(Strava_Data, aes(x = Elevation, y = Pace)) +
+geom_point(alpha = .5) + geom_density_2d(h=3) + facet_wrap(~Terrain)</code></pre>
+<p><img src="/Project2a_files/figure-html/unnamed-chunk-4-2.png" width="768" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>ggplot(Strava_Data, aes(x = Elevation, y = Distance)) +
+geom_point(alpha = .5) + geom_density_2d(h=3) + facet_wrap(~Terrain)</code></pre>
+<p><img src="/Project2a_files/figure-html/unnamed-chunk-4-3.png" width="768" style="display: block; margin: auto;" /></p>
+<p>As seen from the plots above, the data fails the multivariate normality assumption.</p>
+<p>Other assumptions include Homogeneity of covariances, linearity, and no outliers. None of these are met, meaning that almost all of the MANOVA assumptions were not met.</p>
+</div>
+</div>
+<div id="randomization-test" class="section level1">
+<h1>Randomization Test</h1>
+<pre class="r"><code>Strava_Data%&gt;%group_by(Race)%&gt;%
+summarize(means=mean(Pace))%&gt;%
+summarize(`mean_diff:`=diff(means))</code></pre>
+<pre><code>## # A tibble: 1 x 1
+##   `mean_diff:`
+##          &lt;dbl&gt;
+## 1       -0.424</code></pre>
+<p>Races have an average pace that is 0.424 MPH slower than runs that aren’t races.</p>
+<p>Using random sampling (5000 permutations out of all possible permutations), a t-test can be performed.</p>
+<p>-The null hypothesis is that there is no mean difference in pace between runs that are races and runs that are not races.</p>
+<p>-The alternative hypothesis is that there is a mean difference in pace between runs that are races and runs that are not races.</p>
+<pre class="r"><code>rand_dist&lt;-vector()
+for(i in 1:5000){
+new&lt;-data.frame(Pace=sample(Strava_Data$Pace),Race=Strava_Data$Race)
+rand_dist[i]&lt;-mean(new[new$Race==&quot;Yes&quot;,]$Pace)-
+mean(new[new$Race==&quot;No&quot;,]$Pace)}</code></pre>
+<p>Below is the sampling distribution under the null hypothesis.</p>
+<pre class="r"><code>{hist(rand_dist,main=&quot;&quot;,ylab=&quot;&quot;); abline(v = -0.4238789,col=&quot;red&quot;)}</code></pre>
+<p><img src="/Project2a_files/figure-html/unnamed-chunk-7-1.png" width="768" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>mean(rand_dist&gt;0.4238789)*2</code></pre>
+<pre><code>## [1] 0.0012</code></pre>
+<p>0.0012 is the probability of observing a mean difference as extreme as the one from this randomization
+distribution. Since the p value of 0.0012 is less than the alpha value of 0.05, the null hypothesis is rejected. Thus, there is a statistically significant difference in mean pace between runs that are races and runs that are not races.</p>
+</div>
+<div id="linear-regression-model" class="section level1">
+<h1>Linear Regression Model</h1>
+<pre class="r"><code>Strava_Data$Distance_c&lt;-Strava_Data$Distance-mean(Strava_Data$Distance)
+fit&lt;-lm(Pace ~ Distance_c * Terrain, data=Strava_Data)
+summary(fit)</code></pre>
+<pre><code>##
+## Call:
+## lm(formula = Pace ~ Distance_c * Terrain, data =
+Strava_Data)
+##
+## Residuals:
+## Min 1Q Median 3Q Max
+## -5.3068 -0.3674 -0.0306 0.3127 2.7434
+##
+## Coefficients:
+## Estimate Std. Error t value Pr(&gt;|t|)
+## (Intercept) 5.69746 0.04271 133.405 &lt; 2e-16 ***
+## Distance_c -0.02145 0.00313 -6.852 1.72e-11 ***
+## TerrainMixed 0.08386 0.06419 1.306 0.19189
+## TerrainRoad 0.24285 0.07505 3.236 0.00127 **
+## TerrainTreadmill 0.32788 0.14257 2.300 0.02178 *
+## Distance_c:TerrainMixed 0.02088 0.01527 1.367 0.17199
+## Distance_c:TerrainRoad 0.04009 0.01718 2.333 0.01993 *
+## Distance_c:TerrainTreadmill 0.06108 0.04082 1.496
+0.13506
+## ---
+## Signif. codes: 0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1
+&#39; &#39; 1
+##
+## Residual standard error: 0.6079 on 638 degrees of
+freedom
+## Multiple R-squared: 0.103, Adjusted R-squared: 0.09311
+## F-statistic: 10.46 on 7 and 638 DF, p-value: 1.791e-12</code></pre>
+<pre class="r"><code>mean(Strava_Data$Distance)</code></pre>
+<pre><code>## [1] 7.490805</code></pre>
+<pre class="r"><code>sd(Strava_Data$Distance)</code></pre>
+<pre><code>## [1] 8.382459</code></pre>
+<div id="interpretation" class="section level2">
+<h2>Interpretation</h2>
+<p>Pace = 5.7 - (0.02)Distance_c + (0.08)Mixed Terrain + 0.24(Road Terrain) + (0.33)Treadmill Terrain + 0.02(DxTM) + 0.04(DxTR) + 0.06(DxTT)</p>
+<p>5.7 is the pace of a run that was the average distance of all runs, and on trail terrain.</p>
+<p>As distance increases by one standard deviation, pace decreases by 0.02 miles per hour.</p>
+<p>Running on mixed terrain increases pace by 0.08 MPH compared to running on trail terrain.</p>
+<p>Running on road terrain increases pace by 0.24 MPH compared to running on trail terrain.</p>
+<p>Running on a treadmill increases pace by 0.33 MPH compared to running on trail terrain.</p>
+<p>When running on mixed terrain, increasing distance by one standard deviation increases pace by 0.02 MPH compared to running on a trail.</p>
+<p>When running on road terrain, increasing distance by one standard deviation increases pace by 0.04 MPH compared to running on a trail.</p>
+<p>When running on a treadmill, increasing distance by one standard deviation increases pace by 0.06 MPH compared to running on a trail.</p>
+</div>
+<div id="plot-of-the-regression" class="section level2">
+<h2>Plot of the regression</h2>
+<pre class="r"><code>ggplot(Strava_Data, aes(x=Distance_c, y=Pace,group=Terrain))+geom_point(aes(color=Terrain))+
+geom_smooth(method=&quot;lm&quot;,formula=y~1,se=F,fullrange=T,aes(color=Terrain))+ 
+theme(legend.position=c(.9,.19))+xlab(&quot;&quot;)</code></pre>
+<p><img src="/Project2a_files/figure-html/unnamed-chunk-10-1.png" width="768" style="display: block; margin: auto;" /></p>
+</div>
+<div id="assumptions-1" class="section level2">
+<h2>Assumptions</h2>
+<ol style="list-style-type: decimal">
+<li>Linearity</li>
+</ol>
+<pre class="r"><code>resids&lt;-fit$residuals
+fitvals&lt;-fit$fitted.values
+ggplot()+geom_point(aes(fitvals,resids))+geom_hline(yintercept=0, col=&quot;red&quot;)</code></pre>
+<p><img src="/Project2a_files/figure-html/unnamed-chunk-11-1.png" width="768" style="display: block; margin: auto;" /></p>
+<p>The assumption of linearity is questionable, as per the graph above.</p>
+<ol start="2" style="list-style-type: decimal">
+<li>Normality</li>
+</ol>
+<pre class="r"><code>ggplot()+geom_histogram(aes(resids),bins=20)</code></pre>
+<p><img src="/Project2a_files/figure-html/unnamed-chunk-12-1.png" width="768" style="display: block; margin: auto;" /></p>
+<p>The data fails the normality assumption due to the skewedness of the histogram.</p>
+<ol start="3" style="list-style-type: decimal">
+<li>Homoskedasticity</li>
+</ol>
+<pre class="r"><code>bptest(fit)</code></pre>
+<pre><code>## 
+##  studentized Breusch-Pagan test
+## 
+## data:  fit
+## BP = 9.4111, df = 7, p-value = 0.2245</code></pre>
+<p>The p-value of the Breusche-Pagan test indicates that the data meets the heteroskedasticity assumption.</p>
+</div>
+</div>
+<div id="re-run-model-with-robust-standard-errors" class="section level1">
+<h1>Re-run model with robust standard errors</h1>
+<pre class="r"><code>coeftest(fit, vcov=vcovHC(fit))</code></pre>
+<pre><code>##
+## t test of coefficients:
+##
+## Estimate Std. Error t value Pr(&gt;|t|)
+## (Intercept) 5.6974610 0.0413432 137.8089 &lt; 2.2e-16 ***
+## Distance_c -0.0214477 0.0028858 -7.4323 3.446e-13 ***
+## TerrainMixed 0.0838590 0.0593039 1.4141 0.1578330
+## TerrainRoad 0.2428480 0.0649718 3.7377 0.0002023 ***
+## TerrainTreadmill 0.3278749 0.1477893 2.2185 0.0268700 *
+## Distance_c:TerrainMixed 0.0208809 0.0169755 1.2301
+0.2191285
+## Distance_c:TerrainRoad 0.0400949 0.0153466 2.6126
+0.0091965 **
+## Distance_c:TerrainTreadmill 0.0610761 0.0379741 1.6084
+0.1082508
+## ---
+## Signif. codes: 0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1
+&#39; &#39; 1</code></pre>
+<p>There is no change in signficance between the model ran with and without the robust standard errors, however the p-values here are smaller, especially for the variables involving road terrain.</p>
+<p>In both models, the signficant p-values are found for Distance, Road Terrain, Treadmill Terrain, and the interaction of Distance and Road Terrain.</p>
+<p>The effect of increasing distance ran significantly decreases pace.</p>
+<p>The effect of running on road or treadmill terrain compared to trail terrain significanly increases pace.</p>
+<p>The effect of terrain type on pace is different depending on distance ran.</p>
+<pre class="r"><code>RsquareAdj(fit)</code></pre>
+<pre><code>## $r.squared
+## [1] 0.1029537
+## 
+## $adj.r.squared
+## [1] 0.09311147</code></pre>
+<p>The regression model explains 9.3% of the variation in pace.</p>
+<div id="rerun-model-with-main-effects-only" class="section level2">
+<h2>Rerun model with main effects only</h2>
+<pre class="r"><code>fit1 &lt;- lm(Pace ~ Distance_c + Terrain, data=Strava_Data)
+summary(fit1)</code></pre>
+<pre><code>##
+## Call:
+## lm(formula = Pace ~ Distance_c + Terrain, data =
+Strava_Data)
+##
+## Residuals:
+## Min 1Q Median 3Q Max
+## -5.3202 -0.3613 -0.0382 0.3022 2.6744
+##
+## Coefficients:
+## Estimate Std. Error t value Pr(&gt;|t|)
+## (Intercept) 5.689140 0.042810 132.894 &lt; 2e-16 ***
+## Distance_c -0.019000 0.003021 -6.290 5.87e-10 ***
+## TerrainMixed 0.090669 0.064460 1.407 0.1600
+## TerrainRoad 0.151166 0.062232 2.429 0.0154 *
+## TerrainTreadmill 0.174250 0.089417 1.949 0.0518 .
+## ---
+## Signif. codes: 0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1
+&#39; &#39; 1
+##
+## Residual standard error: 0.6108 on 641 degrees of
+freedom
+## Multiple R-squared: 0.09006, Adjusted R-squared: 0.08438
+## F-statistic: 15.86 on 4 and 641 DF, p-value: 2.185e-12</code></pre>
+<p>Re-running the model with only the main effects makes it so that there are fewer significant variables - this time, only distance and road terrain.</p>
+</div>
+<div id="bootstrapped-standard-errors" class="section level2">
+<h2>Bootstrapped Standard Errors</h2>
+<pre class="r"><code>newdat&lt;-Strava_Data
+fit1 &lt;- lm(Pace ~ Distance_c + Terrain, data=Strava_Data)
+resids&lt;-fit1$residuals 
+fitted&lt;-fit1$fitted.values 
+resid_resamp&lt;-replicate(5000,{
+new_resids&lt;-sample(resids,replace=TRUE) 
+newdat$new_Pace&lt;-fitted+new_resids
+fit2&lt;-lm(new_Pace ~ Distance_c * Terrain, data = newdat)
+coef(fit2) 
+})
+resid_resamp%&gt;%t%&gt;%as.data.frame%&gt;%summarize_all(sd)</code></pre>
+<pre><code>## (Intercept) Distance_c TerrainMixed TerrainRoad
+TerrainTreadmill Distance_c:TerrainMixed
+## 1 0.04321045 0.003172717 0.06446006 0.07530557 0.1446283
+0.01558064
+## Distance_c:TerrainRoad Distance_c:TerrainTreadmill
+## 1 0.01715873 0.04211975</code></pre>
+<p>The standard errors here are somewhat larger than the other two models, but are more or less the same.</p>
+</div>
+</div>
+<div id="logistic-regression" class="section level1">
+<h1>Logistic Regression</h1>
+<pre class="r"><code>dat&lt;-Strava_Data%&gt;%mutate(y=ifelse(Race==&quot;Yes&quot;,1,0))
+fit3&lt;- glm( y ~ Distance + Pace + Terrain, data=dat, family=&quot;binomial&quot;)
+summary(fit3)</code></pre>
+<pre><code>##
+## Call:
+## glm(formula = y ~ Distance + Pace + Terrain, family =
+&quot;binomial&quot;,
+## data = dat)
+##
+## Deviance Residuals:
+## Min 1Q Median 3Q Max
+## -1.82134 -0.19299 -0.11823 -0.06744 2.80333
+##
+## Coefficients:
+## Estimate Std. Error z value Pr(&gt;|z|)
+## (Intercept) -11.18632 2.96374 -3.774 0.00016 ***
+## Distance 0.24757 0.04256 5.817 6e-09 ***
+## Pace 1.00127 0.46221 2.166 0.03029 *
+## TerrainMixed -2.22158 1.07950 -2.058 0.03959 *
+## TerrainRoad -0.55660 0.73718 -0.755 0.45023
+## TerrainTreadmill -15.81198 1291.83597 -0.012 0.99023
+## ---
+## Signif. codes: 0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1
+&#39; &#39; 1
+##
+## (Dispersion parameter for binomial family taken to be 1)
+##
+## Null deviance: 230.53 on 645 degrees of freedom
+## Residual deviance: 109.79 on 640 degrees of freedom
+## AIC: 121.79
+##
+## Number of Fisher Scoring iterations: 18</code></pre>
+<pre class="r"><code>exp(coef(fit3))</code></pre>
+<pre><code>## (Intercept) Distance Pace TerrainMixed TerrainRoad
+## 1.386260e-05 1.280910e+00 2.721738e+00 1.084371e-01
+5.731557e-01
+## TerrainTreadmill
+## 1.358141e-07</code></pre>
+<p>Controlling for pace and terrain type, for every 1 mile increase in distance, the odds of a run being a race go up by a factor of 1.28.</p>
+<p>Controlling for distance and terrain type, for every 1 MPH increase in pace, the odds of a run being a race go up by a factor of 2.72.</p>
+<p>Controlling for pace and distance, the odds of a run being a race for a run on mixed terrain are 0.108 times the odds for a run on trail terrain. This means that odds of a race being a run for a run on trail terrain are 9.26 times the odds for a run on mixed terrain.</p>
+<p>Controlling for pace and distance, the odds of a run being a race for a run on road terrain are 0.573 times the odds for a run on trail terrain. This means that odds of a race being a run for a run on trail terrain are 1.75 times the odds for a run on road terrain.</p>
+<p>Controlling for pace and distance, the odds of a run being a race for a run on a treadmill are 1.36E-7 times the odds for a run on trail terrain. This means that odds of a race being a run for a run on trail terrain are over 7 million times the odds for a run on a treadmill.</p>
+<div id="confusion-matrix" class="section level2">
+<h2>Confusion Matrix</h2>
+<pre class="r"><code>dat$prob&lt;-predict(fit3,type=&quot;response&quot;)
+table(predict=as.numeric(dat$prob&gt;.5),truth=dat$y)%&gt;%addmargins</code></pre>
+<pre><code>##        truth
+## predict   0   1 Sum
+##     0   615  14 629
+##     1     3  14  17
+##     Sum 618  28 646</code></pre>
+<p>Accuracy: (615 + 14) / 646 = 0.959</p>
+<p>Sensitivity (True Positive Rate): 14 / 28 = 0.5</p>
+<p>Specificity (True Negative Rate): 615 / 618 = 0.995</p>
+<p>Recall (PPV): 14 / 17 = 0.824</p>
+</div>
+<div id="density-plot" class="section level2">
+<h2>Density Plot</h2>
+<pre class="r"><code>dat$logit&lt;-predict(fit3,type=&quot;link&quot;)
+dat%&gt;%ggplot()+geom_density(aes(logit,color=Race,fill=Race), alpha=.4)+
+theme(legend.position=c(.85,.85))+geom_vline(xintercept=0)+xlab(&quot;predictor (logit)&quot;)</code></pre>
+<p><img src="/Project2a_files/figure-html/unnamed-chunk-20-1.png" width="768" style="display: block; margin: auto;" /></p>
+</div>
+<div id="roc-plot" class="section level2">
+<h2>ROC Plot</h2>
+<pre class="r"><code>ROCplot&lt;-ggplot(dat)+geom_roc(aes(d=y,m=prob), n.cuts=0)
+ROCplot</code></pre>
+<p><img src="/Project2a_files/figure-html/unnamed-chunk-21-1.png" width="768" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>calc_auc(ROCplot)</code></pre>
+<pre><code>##   PANEL group       AUC
+## 1     1    -1 0.9560217</code></pre>
+<p>The AUC here is 0.956, which is a good AUC! There is a 95.6% probability that a randomly selected run that <em>is a race</em> has a higher predicted probability of being a race than a randomly selected run that <em>isn’t a race</em>.</p>
+</div>
+<div id="fold-cross-validation" class="section level2">
+<h2>10-fold Cross Validation</h2>
+<p>Create function to give out of sample model performance statsitics:</p>
+<pre class="r"><code>class_diag&lt;-function(probs,truth){
+tab&lt;-table(factor(probs&gt;.5,levels=c(&quot;FALSE&quot;,&quot;TRUE&quot;)),truth)
+acc=sum(diag(tab))/sum(tab)
+sens=tab[2,2]/colSums(tab)[2]
+spec=tab[1,1]/colSums(tab)[1]
+ppv=tab[2,2]/rowSums(tab)[2]
+if(is.numeric(truth)==FALSE &amp; is.logical(truth)==FALSE) truth&lt;-as.numeric(truth)-1
+#CALCULATE EXACT AUC
+ord&lt;-order(probs, decreasing=TRUE)
+probs &lt;- probs[ord]
+truth &lt;- truth[ord]
+TPR=cumsum(truth)/max(1,sum(truth))
+FPR=cumsum(!truth)/max(1,sum(!truth))
+dup&lt;-c(probs[-1]&gt;=probs[-length(probs)], FALSE)
+TPR&lt;-c(0,TPR[!dup],1)
+FPR&lt;-c(0,FPR[!dup],1)
+n &lt;- length(TPR)
+auc&lt;- sum( ((TPR[-1]+TPR[-n])/2) * (FPR[-1]-FPR[-n]) )
+data.frame(acc,sens,spec,ppv,auc)
+}</code></pre>
+<p>Perform 10-fold cross validation on data</p>
+<pre class="r"><code>dat1&lt;- dat%&gt;%select(-prob,-logit,-Distance_c, -Race)</code></pre>
+<pre class="r"><code>k=10 
+data1&lt;-dat1[sample(nrow(dat1)),] 
+folds&lt;-cut(seq(1:nrow(dat1)),breaks=k,labels=F) 
+diags&lt;-NULL
+
+for(i in 1:k){
+train&lt;-data1[folds!=i,]
+test&lt;-data1[folds==i,]
+truth&lt;-test$y
+fit4&lt;-glm(y~Distance+Pace+Terrain,data=train,family=&quot;binomial&quot;)
+probs&lt;-predict(fit4,newdata = test,type=&quot;response&quot;) 
+diags&lt;-rbind(diags,class_diag(probs,truth))
+}
+apply(diags, 2, mean)</code></pre>
+<pre><code>##       acc      sens      spec       ppv       auc 
+## 0.9736538 0.4716667 0.9951049       NaN 0.9211444</code></pre>
+<p>The AUC decreases by only a little, which means that the model performs slightly better in sample than out of sample, but this doesn’t really suggest that it’s over-fit because it’s to such a small degree. The values for accuracy, sensitivy, and specificity, are nearly the same out of sample as in sample.</p>
+</div>
+</div>
+<div id="lasso-regression" class="section level1">
+<h1>Lasso Regression</h1>
+<pre class="r"><code>lassodat &lt;- Strava_Data%&gt;%mutate(y=ifelse(Race==&quot;Yes&quot;,1,0))%&gt;%
+  select(-Race, -Location)
+fit5 &lt;- glm(y ~ ., data = lassodat, family = &quot;binomial&quot;)
+x &lt;- model.matrix(fit5)
+x &lt;- x[, -1]
+y &lt;- as.matrix(lassodat$y)
+cv.lasso &lt;- cv.glmnet(x, y, family = &quot;binomial&quot;)
+lasso &lt;- glmnet(x, y, lambda = cv.lasso$lambda.1se, family = &quot;binomial&quot;)
+coef(lasso)</code></pre>
+<pre><code>## 20 x 1 sparse Matrix of class &quot;dgCMatrix&quot;
+##                               s0
+## (Intercept)         3.7888219398
+## Date               -0.0006079621
+## DayMonday           .           
+## DaySaturday         2.1211778032
+## DaySunday           0.8490556061
+## DayThursday         .           
+## DayTuesday          .           
+## DayWednesday        .           
+## TimeOfDayMidday    -0.4304694448
+## TimeOfDayAfternoon  .           
+## TimeOfDayEvening    .           
+## TimeOfDayNight      .           
+## Distance            0.0791251700
+## Time                .           
+## Pace                0.2544963975
+## Elevation           0.0015434679
+## TerrainMixed       -1.1335087968
+## TerrainRoad         .           
+## TerrainTreadmill    .           
+## Distance_c          0.0028816827</code></pre>
+<p>From the lasso regression, the retained variables are the date, the day of the week being saturday or sunday, the time of day being midday, the distance, the pace, the elevation, and the terrain being mixed.</p>
+<pre class="r"><code>k=10 
+data2&lt;-dat2[sample(nrow(dat2)),] 
+folds1&lt;-cut(seq(1:nrow(dat2)),breaks=k,labels=F) 
+diags1&lt;-NULL
+
+for(i in 1:k){
+train1&lt;-data2[folds!=i,]
+test1&lt;-data2[folds==i,]
+truth1&lt;-test1$y
+fit6 &lt;- glm(y ~ a + b + c+ d + Date + Distance + Pace + Elevation, data = train1, family = &quot;binomial&quot;)
+probs1&lt;-predict(fit6,newdata = test1,type=&quot;response&quot;) 
+diags1&lt;-rbind(diags1,class_diag(probs1,truth1))
+}
+apply(diags1, 2, mean)</code></pre>
+<pre><code>##       acc      sens      spec       ppv       auc 
+## 0.9705288 0.4950000 0.9902098       NaN 0.9609095</code></pre>
+<p>Here, the out of sample accuracy and specificity are still very good at around the same values, or even higher, as for out of sample performance of the original logistic regression before lassoing. The differences observed between the out of sample performance for the original and lassoed regressions are in sensitivty and AUC. For the lassoed regression, the sensitivty increased from the original regression. Also, the AUC is about the same, indicating this lasso regression is a good model.</p>
+</div>
+
+              <hr>
+              <div class="related-posts">
+                <h5>Related Posts</h5>
+                
+              </div>
+            </div>
+          </div>
+          <hr>
+        <div class="disqus">
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+
+    (function() {
+      
+      
+      if (window.location.hostname == "localhost")
+        return;
+
+      var disqus_shortname = '';
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com/" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div>
+        </div>
+      </div>
+      
+    </div>
+
+    
+    <footer>
+  <div id="footer">
+    <div class="container">
+      <p class="text-muted">&copy; All rights reserved. Powered by <a href="https://gohugo.io/">Hugo</a> and
+      <a href="http://www.github.com/nurlansu/hugo-sustain/">sustain</a> with ♥</p>
+    </div>
+  </div>
+</footer>
+<div class="footer"></div>
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+<script src="/js/docs.min.js"></script>
+<script src="/js/main.js"></script>
+
+<script src="/js/ie10-viewport-bug-workaround.js"></script>
+
+
+    
+  </body>
+</html>

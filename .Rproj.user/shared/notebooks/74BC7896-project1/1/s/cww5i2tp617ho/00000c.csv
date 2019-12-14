@@ -1,0 +1,2 @@
+"0","#does temperature or elevation affect pace?"
+"0","dat4 %>% summarize(mean_Pace = mean(Pace))"

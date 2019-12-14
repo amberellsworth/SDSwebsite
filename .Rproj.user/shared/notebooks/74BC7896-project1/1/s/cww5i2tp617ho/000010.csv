@@ -1,0 +1,1 @@
+"0","dat4 %>% filter(ntile(Min.Temp, 100) <25) %>% summarize(mean_Pace_cold = mean(Pace))"

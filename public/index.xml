@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Chris Turner</title>
+    <link>/</link>
+    <description>Recent content on Chris Turner</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-US</language>
+    <lastBuildDate>Fri, 13 Dec 2019 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Brazos Bend 100 Race Report</title>
+      <link>/blog/brazos-bend-100-race-report/</link>
+      <pubDate>Fri, 13 Dec 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/blog/brazos-bend-100-race-report/</guid>
+      <description>I have completed over 30 races in the past few years, and last December, I DNF’ed (Did Not Finish) for the first, and only, time ever at the 2018 Brazos Bend 100-miler. It was my first attempt at 100 miles, and despite my best physical preparation, I ultimately gave up mentally due to the muddy, wet, and cold conditions.
+Since then, I have been determined to come back to run Brazos in 2019 for redemption.</description>
+    </item>
+    
+    <item>
+      <title>Genome Evolution and BioPython</title>
+      <link>/blog/genome-evolution-and-biopython/</link>
+      <pubDate>Mon, 09 Dec 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/blog/genome-evolution-and-biopython/</guid>
+      <description>Next semester, I will be working for the “Breseq” project in Dr.Barrick’s lab at UT Austin.
+Breseq is a “computational pipeline” that allows one to search for mutations in microbrial-sized genomes (most notably, with E.coli), relative to a reference sequence.
+By comparing sequence mutations, several parameters can be calculated in order to identify rates of genome evolution. For instance, we could evolve E.coli at several different temperatures and compare the differential rates of say, point subsitutions in their genomes to determine whether temperature has an effect on genotype and/or phenotype.</description>
+    </item>
+    
+    <item>
+      <title>Your cat is more unique than you think</title>
+      <link>/blog/your-cat-is-more-unique-than-you-think/</link>
+      <pubDate>Thu, 05 Dec 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/blog/your-cat-is-more-unique-than-you-think/</guid>
+      <description>We all love cats, or at least we all should. My cat, Storm, is especially amazing. She’s a sassy, friendly, and inquisitive 2-year-old tortiose-shell.
+Toriose-shells and calicos both undergo an amazing phenomenon in regards to their fur patterns that makes it impossible to clone them and get the same pattern in the progeny!
+There are some traits that animals can have that are “sex-linked” - that is, they reside on the X chromosome.</description>
+    </item>
+    
+    <item>
+      <title>Projects</title>
+      <link>/projects/</link>
+      <pubDate>Sun, 02 Oct 2016 22:55:05 -0400</pubDate>
+      
+      <guid>/projects/</guid>
+      <description>Here are some projects I have been working on:
+  Project 1
+  Project 2
+  </description>
+    </item>
+    
+    <item>
+      <title>Project 1: Running and Weather Data Visualization</title>
+      <link>/project1/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>/project1/</guid>
+      <description>IntroductionBelow are the two data sets that I will be merging and investigating for this project.
+The first dataset, Strava_Data, I collected manually from an app I have on my phone that tracks my running. I have been using the app since Octtober of 2017, so I collected data from every single run I have recorded since then up until October 1st of this year, which has been 619 runs.</description>
+    </item>
+    
+    <item>
+      <title>Project 2: Modeling, Testing, and Predicting</title>
+      <link>/project2a/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>/project2a/</guid>
+      <description>IntroductionStrava DataStrava is an app that records running activities via GPS. I have had this app for the past 25 months, and have compiled all of the data from every run I have completed in that time. For each run, I have recroded the:
+-Date that I ran
+-Time of day that I ran (Morning was classified as before 11 AM, Midday was classified as 11 AM - 2PM, Afternoon was classified as 2 - 5 PM, Evening was classified as 5 - 9 PM, and Night was classified as after 9 PM.</description>
+    </item>
+    
+  </channel>
+</rss>

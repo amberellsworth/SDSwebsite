@@ -1,0 +1,2 @@
+"0","ROCplot<-ggplot(dat)+geom_roc(aes(d=y,m=prob), n.cuts=0)"
+"0","ROCplot"

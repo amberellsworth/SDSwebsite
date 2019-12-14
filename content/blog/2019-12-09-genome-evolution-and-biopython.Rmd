@@ -1,0 +1,14 @@
+---
+title: Genome Evolution and BioPython
+author: Amber Ellsworth
+date: '2019-12-09'
+slug: genome-evolution-and-biopython
+categories: []
+tags: []
+description: ''
+---
+Next semester, I will be working for the "Breseq" project in Dr.Barrick's lab at UT Austin. 
+
+Breseq is a "computational pipeline" that allows one to search for mutations in microbrial-sized genomes (most notably, with E.coli), relative to a reference sequence. 
+
+By comparing sequence mutations, several parameters can be calculated in order to identify rates of genome evolution. For instance, we could evolve E.coli at several different temperatures and compare the differential rates of say, point subsitutions in their genomes to determine whether temperature has an effect on genotype and/or phenotype. Or, for a more medical application, we could use computational sequencing methods to track rare variants or SNP's within populations of microorganisms. This could help us diagnose disease outcomes with more accuracy by deepening our understanding of "evolutionary trajectories" within populations. 

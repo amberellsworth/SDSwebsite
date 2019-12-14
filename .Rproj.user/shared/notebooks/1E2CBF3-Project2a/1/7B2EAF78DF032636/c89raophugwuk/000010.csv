@@ -1,0 +1,2 @@
+"0","ggplot(Strava_Data, aes(x = Elevation, y = Pace)) +"
+"0","geom_point(alpha = .5) + geom_density_2d(h=3) + facet_wrap(~Terrain)"

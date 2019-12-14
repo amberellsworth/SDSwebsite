@@ -1,0 +1,2 @@
+"0","dat4 %>% group_by(Terrain) %>% summarize(mean_Distance = mean(Distance)) %>% "
+"0","  arrange(desc(mean_Distance))"

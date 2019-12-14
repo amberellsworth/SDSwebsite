@@ -1,0 +1,2 @@
+"0","dat4 %>% group_by(Terrain) %>% summarize(mean_Pace = mean(Pace)) %>% "
+"0","  arrange(desc(mean_Pace))"

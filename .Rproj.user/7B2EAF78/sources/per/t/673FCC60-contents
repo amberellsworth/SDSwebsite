@@ -1,0 +1,451 @@
+---
+title: 'Project 2: Modeling, Testing, and Predicting'
+author: "SDS348 Fall 2019"
+date: '12/1/2019'
+output:
+  pdf_document:
+    toc: yes
+  html_document:
+    toc: yes
+    toc_float:
+      collapsed: no
+      smooth_scroll: yes
+---
+
+```{r setup, include=FALSE}
+library(knitr)
+hook_output = knit_hooks$get('output')
+knit_hooks$set(output = function(x, options) {
+  # this hook is used only when the linewidth option is not NULL
+  if (!is.null(n <- options$linewidth)) {
+    x = knitr:::split_lines(x)
+    # any lines wider than n should be wrapped
+    if (any(nchar(x) > n)) x = strwrap(x, width = n)
+    x = paste(x, collapse = '\n')
+  }
+  hook_output(x, options)
+})
+
+knitr::opts_chunk$set(echo = TRUE, eval = TRUE,fig.align="center",warning=FALSE,message=FALSE,fig.width=8, fig.height=5, linewidth=60)
+options(tibble.width = 100,width = 100)
+library(tidyverse)
+library(readr)
+library(ggplot2)
+library(lmtest)
+library(sandwich)
+library(vegan)
+library(plotROC)
+library(glmnet)
+Strava_Data <- read_csv("Strava Data2.csv", 
+    col_types = cols(Date = col_date(format = "%m/%d/%Y"), 
+        Day = col_character(), Distance = col_number(), 
+        Elevation = col_number(), Location = col_character(), 
+        Pace = col_number(), Race = col_factor(levels = c("No", 
+            "Yes")), Terrain = col_factor(levels = c("Trail", 
+            "Mixed", "Road", "Treadmill")), 
+        Time = col_number(), TimeOfDay = col_factor(levels = c("Morning", 
+            "Midday", "Afternoon", "Evening", 
+            "Night"))))
+```
+
+# Introduction
+
+## Strava Data
+
+Strava is an app that records running activities via GPS. I have had this app for the past 25 months, and have compiled all of the data from every run I have completed in that time. For each run, I have recroded the:
+
+-Date that I ran
+
+-Time of day that I ran (Morning was classified as before 11 AM, Midday was classified as 11 AM - 2PM, Afternoon was classified as 2 - 5 PM, Evening was classified as 5 - 9 PM, and Night was classified as after 9 PM.)
+
+-Location of the run
+
+-Distance I ran, in miles
+
+-Duration of the run, in hours
+
+-Average pace in miles per hour of the run
+
+-Elevation gain during the run
+
+-Type of terrain that I ran on (either road, trail, a mix of the two, or treadmill)
+
+-And whether or not the run was a race 
+
+# MANOVA
+
+```{r}
+man1<-manova(cbind(Distance, Pace, Elevation)~Terrain, data=Strava_Data)
+summary(man1)
+
+```
+
+The p-value is significant, so univariate ANOVAs need to be ran in order to see which numeric variables are significant.
+
+```{r}
+summary.aov(man1)
+```
+
+The p-values of the ANOVA's for all 3 numeric variables are significant, so post-hoc t-tests need to be done for each in order to determine which terrains signficantly differ in either average pace, elevation gain, or distance. 
+
+```{r}
+pairwise.t.test(Strava_Data$Distance,Strava_Data$Terrain,
+p.adj="none")
+
+pairwise.t.test(Strava_Data$Pace,Strava_Data$Terrain,
+p.adj="none")
+
+pairwise.t.test(Strava_Data$Elevation,Strava_Data$Terrain,
+p.adj="none")
+```
+
+At this point I have conducted 22 tests. The probability of a Type I error is equal to 1 - (1-0.05)^22 = 0.6765. Thus, the alpha level needs to be adjusted. Using the Bonferroni correction, the new alpha value = 0.05/22 = 0.00227.
+
+Now, to discuss the significance of the t-tests after adjusting for the new p-value. 
+
+From the t-tests, there were 9 total significant p-values, and 9 non-significant p-values. 
+
+## For distance: 
+The average distance of runs differed significantly between:
+
+-trail and mixed terrain
+
+-trail and road terrain 
+
+-trail and treadmill terrain
+ 
+## For pace:
+The average pace of runs differed significantly between:
+
+-trail and road terrain
+
+-trail and treadmill terrain
+ 
+## For elevation
+The average elevation gain of runs differed significantly between:
+
+-trail and road terrain
+
+-treadmill and trail terrain
+
+-treadmill and mixed terrain
+
+-treadmill and road terrain 
+
+## Assumptions
+
+One of the assumptions for a MANOVA is Multivariate Normality. 
+
+```{r}
+ggplot(Strava_Data, aes(x = Distance, y = Pace)) +
+geom_point(alpha = .5) + geom_density_2d(h=3) + facet_wrap(~Terrain)
+ggplot(Strava_Data, aes(x = Elevation, y = Pace)) +
+geom_point(alpha = .5) + geom_density_2d(h=3) + facet_wrap(~Terrain)
+ggplot(Strava_Data, aes(x = Elevation, y = Distance)) +
+geom_point(alpha = .5) + geom_density_2d(h=3) + facet_wrap(~Terrain)
+```
+
+As seen from the plots above, the data fails the multivariate normality assumption. 
+
+Other assumptions include Homogeneity of covariances, linearity, and no outliers. None of these are met, meaning that almost all of the MANOVA assumptions were not met. 
+
+# Randomization Test
+
+```{r}
+Strava_Data%>%group_by(Race)%>%
+summarize(means=mean(Pace))%>%
+summarize(`mean_diff:`=diff(means))
+```
+
+Races have an average pace that is 0.424 MPH slower than runs that aren't races. 
+
+Using random sampling (5000 permutations out of all possible permutations), a t-test can be performed. 
+
+-The null hypothesis is that there is no mean difference in pace between runs that are races and runs that are not races. 
+
+-The alternative hypothesis is that there is a mean difference in pace between runs that are races and runs that are not races.
+
+```{r}
+rand_dist<-vector()
+for(i in 1:5000){
+new<-data.frame(Pace=sample(Strava_Data$Pace),Race=Strava_Data$Race)
+rand_dist[i]<-mean(new[new$Race=="Yes",]$Pace)-
+mean(new[new$Race=="No",]$Pace)}
+
+```
+
+Below is the sampling distribution under the null hypothesis.
+
+```{r}
+{hist(rand_dist,main="",ylab=""); abline(v = -0.4238789,col="red")}
+```
+
+```{r}
+mean(rand_dist>0.4238789)*2
+```
+
+0.0012 is the probability of observing a mean difference as extreme as the one from this randomization
+distribution. Since the p value of 0.0012 is less than the alpha value of 0.05, the null hypothesis is rejected. Thus, there is a statistically significant difference in mean pace between runs that are races and runs that are not races. 
+
+# Linear Regression Model 
+
+```{r}
+Strava_Data$Distance_c<-Strava_Data$Distance-mean(Strava_Data$Distance)
+fit<-lm(Pace ~ Distance_c * Terrain, data=Strava_Data)
+summary(fit)
+mean(Strava_Data$Distance)
+sd(Strava_Data$Distance)
+```
+
+## Interpretation 
+
+Pace = 5.7 - (0.02)Distance_c + (0.08)Mixed Terrain + 0.24(Road Terrain) + (0.33)Treadmill Terrain + 0.02(DxTM) + 0.04(DxTR) + 0.06(DxTT)
+
+5.7 is the pace of a run that was the average distance of all runs, and on trail terrain. 
+
+As distance increases by one standard deviation, pace decreases by 0.02 miles per hour. 
+
+Running on mixed terrain increases pace by 0.08 MPH compared to running on trail terrain. 
+
+Running on road terrain increases pace by 0.24 MPH compared to running on trail terrain. 
+
+Running on a treadmill increases pace by 0.33 MPH compared to running on trail terrain. 
+
+When running on mixed terrain, increasing distance by one standard deviation increases pace by 0.02 MPH compared to running on a trail. 
+
+When running on road terrain, increasing distance by one standard deviation increases pace by 0.04 MPH compared to running on a trail. 
+ 
+When running on a treadmill, increasing distance by one standard deviation increases pace by 0.06 MPH compared to running on a trail.
+
+## Plot of the regression
+
+```{r}
+ggplot(Strava_Data, aes(x=Distance_c, y=Pace,group=Terrain))+geom_point(aes(color=Terrain))+
+geom_smooth(method="lm",formula=y~1,se=F,fullrange=T,aes(color=Terrain))+ 
+theme(legend.position=c(.9,.19))+xlab("")
+```
+
+## Assumptions
+
+1. Linearity
+
+```{r}
+resids<-fit$residuals
+fitvals<-fit$fitted.values
+ggplot()+geom_point(aes(fitvals,resids))+geom_hline(yintercept=0, col="red")
+```
+
+The assumption of linearity is questionable, as per the graph above. 
+
+2. Normality
+
+```{r}
+ggplot()+geom_histogram(aes(resids),bins=20)
+```
+
+The data fails the normality assumption due to the skewedness of the histogram. 
+
+3. Homoskedasticity
+
+```{r}
+bptest(fit)
+```
+
+The p-value of the Breusche-Pagan test indicates that the data meets the heteroskedasticity assumption. 
+
+# Re-run model with robust standard errors
+
+```{r}
+coeftest(fit, vcov=vcovHC(fit))
+```
+
+There is no change in signficance between the model ran with and without the robust standard errors, however the p-values here are smaller, especially for the variables involving road terrain. 
+
+In both models, the signficant p-values are found for Distance, Road Terrain, Treadmill Terrain, and the interaction of Distance and Road Terrain. 
+
+The effect of increasing distance ran significantly decreases pace. 
+
+The effect of running on road or treadmill terrain compared to trail terrain significanly increases pace. 
+
+The effect of terrain type on pace is different depending on distance ran. 
+
+```{r}
+RsquareAdj(fit)
+```
+
+
+The regression model explains 9.3% of the variation in pace. 
+
+## Rerun model with main effects only
+
+```{r}
+fit1 <- lm(Pace ~ Distance_c + Terrain, data=Strava_Data)
+summary(fit1)
+```
+
+Re-running the model with only the main effects makes it so that there are fewer significant variables - this time, only distance and road terrain. 
+
+## Bootstrapped Standard Errors
+
+```{r}
+newdat<-Strava_Data
+fit1 <- lm(Pace ~ Distance_c + Terrain, data=Strava_Data)
+resids<-fit1$residuals 
+fitted<-fit1$fitted.values 
+resid_resamp<-replicate(5000,{
+new_resids<-sample(resids,replace=TRUE) 
+newdat$new_Pace<-fitted+new_resids
+fit2<-lm(new_Pace ~ Distance_c * Terrain, data = newdat)
+coef(fit2) 
+})
+resid_resamp%>%t%>%as.data.frame%>%summarize_all(sd)
+```
+
+The standard errors here are somewhat larger than the other two models, but are more or less the same. 
+
+# Logistic Regression
+
+```{r}
+dat<-Strava_Data%>%mutate(y=ifelse(Race=="Yes",1,0))
+fit3<- glm( y ~ Distance + Pace + Terrain, data=dat, family="binomial")
+summary(fit3)
+exp(coef(fit3))
+```
+ 
+Controlling for pace and terrain type, for every 1 mile increase in distance, the odds of a run being a race go up by a factor of 1.28.
+ 
+Controlling for distance and terrain type, for every 1 MPH increase in pace, the odds of a run being a race go up by a factor of 2.72. 
+
+Controlling for pace and distance, the odds of a run being a race for a run on mixed terrain are 0.108 times the odds for a run on trail terrain. This means that odds of a race being a run for a run on trail terrain are 9.26 times the odds for a run on mixed terrain. 
+
+Controlling for pace and distance, the odds of a run being a race for a run on road terrain are 0.573 times the odds for a run on trail terrain. This means that odds of a race being a run for a run on trail terrain are 1.75 times the odds for a run on road terrain. 
+
+Controlling for pace and distance, the odds of a run being a race for a run on a treadmill are 1.36E-7 times the odds for a run on trail terrain. This means that odds of a race being a run for a run on trail terrain are over 7 million times the odds for a run on a treadmill. 
+
+## Confusion Matrix
+
+```{r}
+dat$prob<-predict(fit3,type="response")
+table(predict=as.numeric(dat$prob>.5),truth=dat$y)%>%addmargins
+```
+
+
+Accuracy: (615 + 14) / 646 = 0.959
+
+Sensitivity (True Positive Rate): 14 / 28 = 0.5
+
+Specificity (True Negative Rate): 615 / 618 = 0.995
+
+Recall (PPV): 14 / 17 = 0.824
+
+## Density Plot
+
+```{r}
+dat$logit<-predict(fit3,type="link")
+dat%>%ggplot()+geom_density(aes(logit,color=Race,fill=Race), alpha=.4)+
+theme(legend.position=c(.85,.85))+geom_vline(xintercept=0)+xlab("predictor (logit)")
+```
+
+## ROC Plot
+
+```{r}
+ROCplot<-ggplot(dat)+geom_roc(aes(d=y,m=prob), n.cuts=0)
+ROCplot
+calc_auc(ROCplot)
+```
+
+The AUC here is 0.956, which is a good AUC! There is a 95.6% probability that a randomly selected run that *is a race* has a higher predicted probability of being a race than a randomly selected run that *isn't a race*.
+
+## 10-fold Cross Validation
+
+Create function to give out of sample model performance statsitics:
+
+```{r}
+class_diag<-function(probs,truth){
+tab<-table(factor(probs>.5,levels=c("FALSE","TRUE")),truth)
+acc=sum(diag(tab))/sum(tab)
+sens=tab[2,2]/colSums(tab)[2]
+spec=tab[1,1]/colSums(tab)[1]
+ppv=tab[2,2]/rowSums(tab)[2]
+if(is.numeric(truth)==FALSE & is.logical(truth)==FALSE) truth<-as.numeric(truth)-1
+#CALCULATE EXACT AUC
+ord<-order(probs, decreasing=TRUE)
+probs <- probs[ord]
+truth <- truth[ord]
+TPR=cumsum(truth)/max(1,sum(truth))
+FPR=cumsum(!truth)/max(1,sum(!truth))
+dup<-c(probs[-1]>=probs[-length(probs)], FALSE)
+TPR<-c(0,TPR[!dup],1)
+FPR<-c(0,FPR[!dup],1)
+n <- length(TPR)
+auc<- sum( ((TPR[-1]+TPR[-n])/2) * (FPR[-1]-FPR[-n]) )
+data.frame(acc,sens,spec,ppv,auc)
+}
+```
+
+Perform 10-fold cross validation on data
+
+```{r}
+dat1<- dat%>%select(-prob,-logit,-Distance_c, -Race)
+```
+
+```{r}
+
+k=10 
+data1<-dat1[sample(nrow(dat1)),] 
+folds<-cut(seq(1:nrow(dat1)),breaks=k,labels=F) 
+diags<-NULL
+
+for(i in 1:k){
+train<-data1[folds!=i,]
+test<-data1[folds==i,]
+truth<-test$y
+fit4<-glm(y~Distance+Pace+Terrain,data=train,family="binomial")
+probs<-predict(fit4,newdata = test,type="response") 
+diags<-rbind(diags,class_diag(probs,truth))}
+
+apply(diags, 2, mean)
+
+```
+
+
+The AUC decreases by only a little, which means that the model performs slightly better in sample than out of sample, but this doesn't really suggest that it's over-fit because it's to such a small degree. The values for accuracy, sensitivy, and specificity, are nearly the same out of sample as in sample.  
+
+# Lasso Regression
+
+```{r}
+lassodat <- Strava_Data%>%mutate(y=ifelse(Race=="Yes",1,0))%>%
+  select(-Race, -Location)
+fit5 <- glm(y ~ ., data = lassodat, family = "binomial")
+x <- model.matrix(fit5)
+x <- x[, -1]
+y <- as.matrix(lassodat$y)
+cv.lasso <- cv.glmnet(x, y, family = "binomial")
+lasso <- glmnet(x, y, lambda = cv.lasso$lambda.1se, family = "binomial")
+coef(lasso)
+```
+
+From the lasso regression, the retained variables are the date, the day of the week being saturday or sunday, the time of day being midday, the distance, the pace, the elevation, and the terrain being mixed. 
+
+```{r, echo=FALSE}
+dat2 <- lassodat %>% mutate(a = ifelse(TimeOfDay == "Midday", 1, 0),
+b = ifelse(Day == "Saturday", 1, 0), c=ifelse(Day=="Sunday",1,0), d=ifelse(Terrain=="Mixed",1,0))
+```
+
+```{r}
+k=10 
+data2<-dat2[sample(nrow(dat2)),] 
+folds1<-cut(seq(1:nrow(dat2)),breaks=k,labels=F) 
+diags1<-NULL
+for(i in 1:k){
+train1<-data2[folds!=i,]
+test1<-data2[folds==i,]
+truth1<-test1$y
+fit6 <- glm(y ~ a + b + c+ d + Date + Distance + Pace + Elevation, data = train1, family = "binomial")
+probs1<-predict(fit6,newdata = test1,type="response") 
+diags1<-rbind(diags1,class_diag(probs1,truth1))}
+apply(diags1, 2, mean)
+```
+
+
+Here, the out of sample accuracy and specificity  are still very good at around the same values, or even higher, as for out of sample performance of the original logistic regression before lassoing. The differences observed between the out of sample performance for the original and lassoed regressions are in sensitivty and AUC. For the lassoed regression, the sensitivty increased from the original regression. Also, the AUC is about the same, indicating this lasso regression is a good model. 

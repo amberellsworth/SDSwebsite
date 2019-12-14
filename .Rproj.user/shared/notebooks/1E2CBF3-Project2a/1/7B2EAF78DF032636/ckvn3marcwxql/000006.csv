@@ -1,0 +1,3 @@
+"0","Strava_Data%>%group_by(Race)%>%"
+"0","summarize(means=mean(Pace))%>%"
+"0","summarize(`mean_diff:`=diff(means))"

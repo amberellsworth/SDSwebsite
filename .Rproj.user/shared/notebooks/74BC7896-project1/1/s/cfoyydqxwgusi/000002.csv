@@ -1,0 +1,7 @@
+"0","dat7 <- dat4 %>%  filter(Race==""Yes"", Terrain==""Trail"", Distance > 27)"
+"0","ggplot(data = dat7, aes(x = Distance, y = Pace, fill = GainPerMile)) + theme_dark() + "
+"0","  geom_tile(height=0.1, width=0.02)  + "
+"0","  scale_fill_continuous(low=""#c1f4e3"", high=""#076d4b"", name = ""Gain Per Mile (ft)"") +"
+"0","  scale_x_log10() +"
+"0","  labs(x = ""Distance (miles)"", y = ""Pace (mph)"", "
+"0","       title = ""The effect of elevation gain per mile and distance on pace during ultras"")"

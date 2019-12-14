@@ -1,0 +1,6 @@
+"0","dat6 <- dat4 %>% filter(Elevation > 37.9)"
+"0","ggplot(data = dat6, aes(x = Elevation, y = Pace, fill = Avg.Temp)) + theme_dark() + "
+"0","  geom_tile(height=0.085, width=0.03, alpha=0.7)  + "
+"0","  scale_fill_continuous(low=""blue"", high=""red"", name = ""Temp"") +"
+"0","  scale_x_log10() +"
+"0","labs(x = ""Elevation Gain (ft)"", y = ""Pace (mph)"", title = ""The effect of elevation gain and temperature on pace"")"

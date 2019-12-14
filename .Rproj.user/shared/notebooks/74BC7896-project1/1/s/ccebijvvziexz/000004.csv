@@ -1,0 +1,2 @@
+"0","dat4 %>% group_by(Date, Distance) %>% filter(Race==""Yes"", Terrain==""Trail"", Distance > 27) %>% "
+"0","  summarize(Pace_mph = mean(Pace)) %>% arrange(desc(Pace_mph))"
