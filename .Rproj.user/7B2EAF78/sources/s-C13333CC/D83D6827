@@ -5,14 +5,14 @@
     "dirty" : false,
     "encoding" : "UTF-8",
     "folds" : "",
-    "hash" : "4157830943",
+    "hash" : "0",
     "id" : "D83D6827",
-    "lastKnownWriteTime" : 1576297473,
-    "last_content_update" : 1576297473053,
+    "lastKnownWriteTime" : 1576299701,
+    "last_content_update" : 1576299701809,
     "path" : "C:/Users/Amber/Desktop/SDSWebsite/config.toml",
     "project_path" : "config.toml",
     "properties" : {
-        "cursorPosition" : "0,12",
+        "cursorPosition" : "2,24",
         "scrollLine" : "0"
     },
     "read_only" : false,
